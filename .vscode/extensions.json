@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "serayuzgur.crates",
+    "rust-lang.rust-analyzer",
+    "bungcip.better-toml",
+    "gruntfuggly.todo-tree",
+    "polymeilex.wgsl"
+  ]
+}
