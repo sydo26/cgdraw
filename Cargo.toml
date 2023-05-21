@@ -15,3 +15,9 @@ authors = ["sydo26 <sydoafk@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+
+[workspace]
+members = [
+    "crates/*",
+]
