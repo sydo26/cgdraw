@@ -1,5 +1,6 @@
 use winit::event;
 
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum VirtualKeyCode {
     Num1,
     Num2,
