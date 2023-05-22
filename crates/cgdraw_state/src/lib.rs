@@ -1,4 +1,4 @@
-use cgdraw_ui::window::Window;
+use winit::window::Window;
 
 pub struct State {
     /**
@@ -23,8 +23,8 @@ pub struct State {
 }
 
 impl State {
-    pub async fn new(w: Window) -> Self {
-        let size = w.window.inner_size();
+    pub async fn new(window: &Window) -> Self {
+        let size = window.inner_size();
 
         // Backends: Vulkan, Metal, DX12, DX11, Browser WebGPU e GL
         // Usado para criar o dispositivo e a fila de comandos.
@@ -41,7 +41,7 @@ impl State {
             dx12_shader_compiler,
         });
 
-        let surface = unsafe { instance.create_surface(&w.window) }.unwrap();
+        let surface = unsafe { instance.create_surface(window) }.unwrap();
 
         // let adapter = instance
         //     .enumerate_adapters(backends)

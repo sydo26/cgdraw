@@ -8,4 +8,5 @@ edition = "2021"
 [dependencies]
 cgdraw_core = { path = "../cgdraw_core", version = "0.1.0" }
 cgdraw_ui = { path = "../cgdraw_ui", version = "0.1.0" }
+cgdraw_state = { path = "../cgdraw_state", version = "0.1.0" }
 pollster = "0.3.0"

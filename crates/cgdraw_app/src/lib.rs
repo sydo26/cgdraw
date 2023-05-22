@@ -1,3 +1,4 @@
+use cgdraw_state::State;
 use cgdraw_ui::window::{Window, WindowEvent};
 use events::AppEvent;
 
@@ -7,12 +8,21 @@ pub struct App {
     window: Window,
 }
 
+impl Default for App {
+    fn default() -> Self {
+        let window = Window::default();
+
+        Self { window }
+    }
+}
+
 impl App {
-    #[inline]
-    pub fn run<F>(self, mut event_handler: F) -> !
+    async fn run_async<F>(self, mut event_handler: F) -> !
     where
         F: 'static + FnMut(AppEvent),
     {
+        let state = State::new(&self.window.window).await;
+
         self.window.run(move |window_event| match window_event {
             WindowEvent::Redraw => {
                 event_handler(AppEvent::Update);
@@ -28,12 +38,12 @@ impl App {
             }),
         })
     }
-}
 
-impl Default for App {
-    fn default() -> Self {
-        Self {
-            window: Window::default(),
-        }
+    #[inline]
+    pub fn run<F>(self, event_handler: F) -> !
+    where
+        F: 'static + FnMut(AppEvent),
+    {
+        pollster::block_on(self.run_async(event_handler));
     }
 }
