@@ -11,3 +11,4 @@ repository = "https://github.com/sydo26/cgdraw"
 [dependencies]
 wgpu = { version = "0.16.0" }
 winit = { version = "0.28.6" }
+cgdraw_core = { path = "../cgdraw_core", version = "0.1.0" }
