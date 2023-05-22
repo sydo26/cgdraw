@@ -7,6 +7,7 @@ pub enum WindowEvent {
     Close,
     Redraw,
     KeyPressed { key_code: VirtualKeyCode },
+    KeyUp { key_code: VirtualKeyCode },
 }
 
 pub struct Window {
@@ -45,6 +46,23 @@ impl Window {
                     if let Some(vkc) = virtual_keycode {
                         VirtualKeyCode::by_winit_keycode(*vkc)
                             .map(|key_code| WindowEvent::KeyPressed { key_code })
+                    } else {
+                        None
+                    }
+                }
+
+                event::WindowEvent::KeyboardInput {
+                    input:
+                        event::KeyboardInput {
+                            state: event::ElementState::Released,
+                            virtual_keycode,
+                            ..
+                        },
+                    ..
+                } => {
+                    if let Some(vkc) = virtual_keycode {
+                        VirtualKeyCode::by_winit_keycode(*vkc)
+                            .map(|key_code| WindowEvent::KeyUp { key_code })
                     } else {
                         None
                     }

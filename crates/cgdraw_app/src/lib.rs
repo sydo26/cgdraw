@@ -40,6 +40,8 @@ impl App {
             WindowEvent::KeyPressed { key_code } => {
                 event_handler(AppEvent::KeyPressed { key_code })
             }
+
+            WindowEvent::KeyUp { key_code } => event_handler(AppEvent::KeyUp { key_code }),
         })
     }
 
