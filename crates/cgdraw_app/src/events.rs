@@ -5,8 +5,9 @@ pub enum AppEvent {
     Finished,
     Update,
     Draw,
-    KeyDown,
+
     KeyPressed { key_code: VirtualKeyCode },
-    Keyup,
+    KeyUp { key_code: VirtualKeyCode },
+
     Resize { width: u32, height: u32 },
 }
