@@ -2,7 +2,6 @@ use cgdraw_ui::window::{Window, WindowEvent};
 use events::AppEvent;
 
 pub mod events;
-pub mod keyboard;
 
 pub struct App {
     window: Window,
