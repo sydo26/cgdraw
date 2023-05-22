@@ -26,11 +26,10 @@ impl App {
         self.window.run(move |window_event| match window_event {
             WindowEvent::Redraw => {
                 event_handler(AppEvent::Update);
+                event_handler(AppEvent::Draw);
             }
 
             WindowEvent::Close => event_handler(AppEvent::Finished),
-
-            WindowEvent::RedrawEventsCleared => {}
 
             WindowEvent::Resize { size } => event_handler(AppEvent::Resize {
                 width: size.width,

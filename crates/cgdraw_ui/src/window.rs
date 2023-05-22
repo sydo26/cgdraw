@@ -2,7 +2,6 @@ use cgdraw_core::keyboard::keys::VirtualKeyCode;
 use winit::{dpi::PhysicalSize, event, event_loop};
 
 pub enum WindowEvent {
-    RedrawEventsCleared,
     Resize { size: PhysicalSize<u32> },
     Close,
     Redraw,
@@ -129,7 +128,7 @@ impl Window {
 
                 // Redraw request
                 event::Event::RedrawRequested(_) => {
-                    // builder.redraw_requested();
+                    handler(WindowEvent::Redraw);
                 }
 
                 _ => (),
