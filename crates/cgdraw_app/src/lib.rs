@@ -21,7 +21,7 @@ impl App {
     where
         F: 'static + FnMut(AppEvent),
     {
-        let state = State::new(&self.window.window).await;
+        // let state = State::new(&self.window.window).await;
 
         self.window.run(move |window_event| match window_event {
             WindowEvent::Redraw => {
@@ -36,6 +36,10 @@ impl App {
                 width: size.width,
                 height: size.height,
             }),
+
+            WindowEvent::KeyPressed { key_code } => {
+                event_handler(AppEvent::KeyPressed { key_code })
+            }
         })
     }
 
