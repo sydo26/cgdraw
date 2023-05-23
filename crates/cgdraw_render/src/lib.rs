@@ -2,37 +2,37 @@ use std::iter::once;
 
 mod graphic;
 mod pipeline;
+mod state;
 
 use cgdraw_core::graphic::Texture;
 use cgdraw_state::State;
 pub use graphic::*;
 pub use pipeline::*;
+pub use state::*;
 
 pub struct Render<'a> {
-    state: &'a mut State,
-    main_pipeline: Option<MainPipeline>,
+    pub state: &'a State,
+    pub render_state: RenderState,
     default_view: Option<wgpu::TextureView>,
-    depth_view: Option<Texture>,
 }
 
 impl<'a> Render<'a> {
-    pub fn new(state: &'a mut State) -> Self {
+    pub fn new(state: &'a State, render_state: RenderState) -> Self {
         Self {
             state,
-            main_pipeline: None,
+            render_state,
             default_view: None,
-            depth_view: None,
         }
     }
 }
 
 impl<'a> Render<'a> {
     fn render_pass(self) {
-        if self.default_view.is_some() && self.depth_view.is_some() && self.main_pipeline.is_some()
-        {
-            let depth_view = self.depth_view.unwrap().view;
-            let default_view = self.default_view.unwrap();
-            let main_pipeline = self.main_pipeline.unwrap().pipeline;
+        if let Some(default_view) = self.default_view {
+            let depth_view =
+                Texture::create_depth_texture(&self.state.device, &self.state.surface_config).view;
+            let main_pipeline =
+                MainPipeline::new(&self.state.device, self.state.surface_config.format);
 
             let mut encoder =
                 self.state
@@ -69,8 +69,12 @@ impl<'a> Render<'a> {
             {
                 let mut pass = encoder.begin_render_pass(&desc);
 
-                pass.set_pipeline(&main_pipeline);
-                // pass.set_stencil_reference(0);
+                pass.set_pipeline(&main_pipeline.pipeline);
+                pass.set_stencil_reference(0);
+
+                for vb in self.render_state.buffers.vertices.iter() {
+                    pass.draw_vertices(vb);
+                }
             }
 
             self.state.queue.submit(once(encoder.finish()));
@@ -98,16 +102,6 @@ impl<'a> Render<'a> {
                 .texture
                 .create_view(&wgpu::TextureViewDescriptor::default()),
         );
-
-        self.depth_view = Some(Texture::create_depth_texture(
-            &self.state.device,
-            &self.state.surface_config,
-        ));
-
-        self.main_pipeline = Some(MainPipeline::new(
-            &self.state.device,
-            self.state.surface_config.format,
-        ));
 
         self.render_pass();
 
