@@ -1,4 +1,5 @@
 use cgdraw_app::{events::AppEvent, App};
+use cgdraw_core::color::Color;
 
 fn main() {
     let app = App::default();
@@ -10,7 +11,15 @@ fn main() {
 
         AppEvent::Update => {}
 
-        AppEvent::Draw => {}
+        AppEvent::Draw { graphics } => {
+            graphics.color(Color::CYAN);
+
+            graphics.save_vertice(-0.5, 0.5, 0.0);
+            graphics.save_vertice(0.5, 0.5, 0.0);
+            graphics.save_vertice(0.5, -0.5, 0.0);
+
+            graphics.draw([0, 1, 2, 2, 1, 0].to_vec());
+        }
 
         AppEvent::KeyPressed { .. } => {
             println!("KeyPressed");
@@ -20,8 +29,6 @@ fn main() {
             println!("KeyUp");
         }
 
-        _ => {
-            println!("Default");
-        }
+        _ => {}
     });
 }
