@@ -1,9 +1,11 @@
 use std::iter::once;
 
+mod graphic;
 mod pipeline;
 
 use cgdraw_core::graphic::Texture;
 use cgdraw_state::State;
+pub use graphic::*;
 pub use pipeline::*;
 
 pub struct Render<'a> {
