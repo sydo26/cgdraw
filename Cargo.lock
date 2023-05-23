@@ -245,6 +245,7 @@ name = "cgdraw"
 version = "0.1.0"
 dependencies = [
  "cgdraw_app",
+ "cgdraw_core",
 ]
 
 [[package]]
@@ -256,6 +257,7 @@ dependencies = [
  "cgdraw_state",
  "cgdraw_ui",
  "pollster",
+ "wgpu",
 ]
 
 [[package]]
