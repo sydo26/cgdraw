@@ -1,3 +1,5 @@
+use wgpu::util::DeviceExt;
+
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Vertex {
@@ -27,5 +29,21 @@ impl Vertex {
                 },
             ],
         }
+    }
+
+    pub fn create_buffer(device: &wgpu::Device, vertices: &[Vertex]) -> wgpu::Buffer {
+        device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(vertices),
+            usage: wgpu::BufferUsages::VERTEX,
+        })
+    }
+
+    pub fn create_buffer_for_index(device: &wgpu::Device, indices: &[u16]) -> wgpu::Buffer {
+        device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(indices),
+            usage: wgpu::BufferUsages::INDEX,
+        })
     }
 }
