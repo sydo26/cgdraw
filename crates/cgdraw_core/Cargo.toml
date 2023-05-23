@@ -9,3 +9,4 @@ edition = "2021"
 winit = "0.28.6"
 wgpu = { version = "0.16.0" }
 bytemuck = { version = "1.13.1", features = ["derive"] }
+palette = "0.7.0"
