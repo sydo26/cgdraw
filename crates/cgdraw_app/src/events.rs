@@ -1,10 +1,12 @@
 use cgdraw_core::keyboard::keys::VirtualKeyCode;
 
-pub enum AppEvent {
+use crate::graphics::Graphics;
+
+pub enum AppEvent<'a> {
     Setup,
     Finished,
     Update,
-    Draw,
+    Draw { graphics: &'a mut Graphics<'a> },
 
     KeyPressed { key_code: VirtualKeyCode },
     KeyUp { key_code: VirtualKeyCode },

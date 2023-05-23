@@ -1,9 +1,11 @@
-use cgdraw_render::Render;
+use cgdraw_render::{Render, RenderState};
 use cgdraw_state::State;
 use cgdraw_ui::window::{Window, WindowEvent};
 use events::AppEvent;
+use graphics::Graphics;
 
 pub mod events;
+pub mod graphics;
 
 pub struct App {
     window: Window,
@@ -41,9 +43,13 @@ impl App {
 
             WindowEvent::Redraw => {
                 event_handler(AppEvent::Update);
-                if let Some(state) = &mut self.state {
-                    Render::new(state).build();
-                    event_handler(AppEvent::Draw);
+                if let Some(state) = &self.state {
+                    let mut render = Render::new(state, RenderState::default());
+
+                    let graphics = &mut Graphics::new(&mut render.render_state, state);
+                    event_handler(AppEvent::Draw { graphics });
+
+                    render.build();
                 }
             }
 
