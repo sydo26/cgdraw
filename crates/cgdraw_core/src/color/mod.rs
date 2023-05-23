@@ -69,4 +69,10 @@ impl Color {
             Color::SKYBLUE => SrgbColor::from_raw(135, 206, 235),
         }
     }
+
+    pub fn to_vector(self) -> [f32; 3] {
+        let srgb = self.get_srgb();
+
+        [srgb.r, srgb.g, srgb.b]
+    }
 }
