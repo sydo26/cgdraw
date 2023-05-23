@@ -243,6 +243,7 @@ name = "cgdraw_app"
 version = "0.1.0"
 dependencies = [
  "cgdraw_core",
+ "cgdraw_render",
  "cgdraw_state",
  "cgdraw_ui",
  "pollster",
@@ -262,6 +263,7 @@ name = "cgdraw_render"
 version = "0.1.0"
 dependencies = [
  "cgdraw_core",
+ "cgdraw_state",
  "wgpu",
 ]
 
