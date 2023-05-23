@@ -1,3 +1,4 @@
+use cgdraw_render::Render;
 use cgdraw_state::State;
 use cgdraw_ui::window::{Window, WindowEvent};
 use events::AppEvent;
@@ -6,27 +7,44 @@ pub mod events;
 
 pub struct App {
     window: Window,
+    state: Option<State>,
 }
 
 impl Default for App {
     fn default() -> Self {
         let window = Window::default();
 
-        Self { window }
+        Self {
+            window,
+            state: None,
+        }
     }
 }
 
 impl App {
-    async fn run_async<F>(self, mut event_handler: F) -> !
+    async fn run_async<F>(mut self, mut event_handler: F) -> !
     where
         F: 'static + FnMut(AppEvent),
     {
-        // let state = State::new(&self.window.window).await;
+        self.state = Some(State::new(&self.window.window).await);
 
         self.window.run(move |window_event| match window_event {
+            WindowEvent::Resumed => {
+                event_handler(AppEvent::Setup);
+
+                if let Some(state) = &mut self.state {
+                    state
+                        .surface
+                        .configure(&state.device, &state.surface_config);
+                }
+            }
+
             WindowEvent::Redraw => {
                 event_handler(AppEvent::Update);
-                event_handler(AppEvent::Draw);
+                if let Some(state) = &mut self.state {
+                    Render::new(state).build();
+                    event_handler(AppEvent::Draw);
+                }
             }
 
             WindowEvent::Close => event_handler(AppEvent::Finished),

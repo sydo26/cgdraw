@@ -3,27 +3,20 @@ use std::iter::once;
 mod pipeline;
 
 use cgdraw_core::graphic::Texture;
+use cgdraw_state::State;
 pub use pipeline::*;
 
 pub struct Render<'a> {
-    surface: &'a wgpu::Surface,
-    device: &'a wgpu::Device,
-    queue: &'a wgpu::Queue,
+    state: &'a mut State,
     main_pipeline: Option<MainPipeline>,
     default_view: Option<wgpu::TextureView>,
     depth_view: Option<Texture>,
 }
 
 impl<'a> Render<'a> {
-    pub fn new(
-        surface: &'a wgpu::Surface,
-        device: &'a wgpu::Device,
-        queue: &'a wgpu::Queue,
-    ) -> Self {
+    pub fn new(state: &'a mut State) -> Self {
         Self {
-            surface,
-            device,
-            queue,
+            state,
             main_pipeline: None,
             default_view: None,
             depth_view: None,
@@ -39,11 +32,12 @@ impl<'a> Render<'a> {
             let default_view = self.default_view.unwrap();
             let main_pipeline = self.main_pipeline.unwrap().pipeline;
 
-            let mut encoder = self
-                .device
-                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                    label: Some("Command Encoder"),
-                });
+            let mut encoder =
+                self.state
+                    .device
+                    .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                        label: Some("Command Encoder"),
+                    });
 
             let desc = wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
@@ -74,21 +68,24 @@ impl<'a> Render<'a> {
                 let mut pass = encoder.begin_render_pass(&desc);
 
                 pass.set_pipeline(&main_pipeline);
-                pass.set_stencil_reference(0);
+                // pass.set_stencil_reference(0);
             }
 
-            self.queue.submit(once(encoder.finish()));
+            self.state.queue.submit(once(encoder.finish()));
         }
     }
 }
 
 impl<'a> Render<'a> {
-    pub fn build(mut self, config: &'a wgpu::SurfaceConfiguration) {
-        let frame = match self.surface.get_current_texture() {
+    pub fn build(mut self) {
+        let frame = match self.state.surface.get_current_texture() {
             Ok(frame) => frame,
             Err(_) => {
-                self.surface.configure(self.device, config);
-                self.surface
+                self.state
+                    .surface
+                    .configure(&self.state.device, &self.state.surface_config);
+                self.state
+                    .surface
                     .get_current_texture()
                     .expect("Failed to acquire next surface texture!")
             }
@@ -100,9 +97,15 @@ impl<'a> Render<'a> {
                 .create_view(&wgpu::TextureViewDescriptor::default()),
         );
 
-        self.depth_view = Some(Texture::create_depth_texture(self.device, config));
+        self.depth_view = Some(Texture::create_depth_texture(
+            &self.state.device,
+            &self.state.surface_config,
+        ));
 
-        self.main_pipeline = Some(MainPipeline::new(self.device, config.format));
+        self.main_pipeline = Some(MainPipeline::new(
+            &self.state.device,
+            self.state.surface_config.format,
+        ));
 
         self.render_pass();
 

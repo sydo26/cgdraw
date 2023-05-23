@@ -7,6 +7,7 @@ pub enum WindowEvent {
     Redraw,
     KeyPressed { key_code: VirtualKeyCode },
     KeyUp { key_code: VirtualKeyCode },
+    Resumed,
 }
 
 pub struct Window {
@@ -129,6 +130,10 @@ impl Window {
                 // Redraw request
                 event::Event::RedrawRequested(_) => {
                     handler(WindowEvent::Redraw);
+                }
+
+                event::Event::Resumed => {
+                    handler(WindowEvent::Resumed);
                 }
 
                 _ => (),

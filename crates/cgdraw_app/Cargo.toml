@@ -9,4 +9,5 @@ edition = "2021"
 cgdraw_core = { path = "../cgdraw_core", version = "0.1.0" }
 cgdraw_ui = { path = "../cgdraw_ui", version = "0.1.0" }
 cgdraw_state = { path = "../cgdraw_state", version = "0.1.0" }
+cgdraw_render = { path = "../cgdraw_render", version = "0.1.0" }
 pollster = "0.3.0"

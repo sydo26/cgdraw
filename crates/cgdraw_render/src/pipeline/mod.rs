@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use cgdraw_core::graphic::Texture;
+use cgdraw_core::graphic::{Texture, Vertex};
 
 pub struct MainPipeline {
     pub pipeline_layout: wgpu::PipelineLayout,
@@ -31,7 +31,7 @@ impl MainPipeline {
         let vertex_state = wgpu::VertexState {
             module: &shader_module,
             entry_point: "vs_main",
-            buffers: &[], // TODO: Add desc buffers
+            buffers: &[Vertex::desc()],
         };
 
         let fragment_state = wgpu::FragmentState {
