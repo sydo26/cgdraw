@@ -229,6 +229,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "cameras_controller_example"
+version = "0.1.0"
+dependencies = [
+ "cgdraw",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
