@@ -1,5 +1,4 @@
-use cgdraw_app::{events::AppEvent, App};
-use cgdraw_core::color::Color;
+use cgdraw::{event::AppEvent, App, Color};
 
 fn main() {
     let app = App::default();
