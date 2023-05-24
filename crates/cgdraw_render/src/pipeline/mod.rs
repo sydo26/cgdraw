@@ -8,7 +8,11 @@ pub struct MainPipeline {
 }
 
 impl MainPipeline {
-    pub fn new(device: &wgpu::Device, format: wgpu::TextureFormat) -> Self {
+    pub fn new(
+        device: &wgpu::Device,
+        format: wgpu::TextureFormat,
+        bind_group_layouts: &[&wgpu::BindGroupLayout],
+    ) -> Self {
         let shader_source = wgpu::ShaderSource::Wgsl(Cow::Borrowed(include_str!(
             "../../../../assets/shaders/shader.wgsl"
         )));
@@ -22,7 +26,7 @@ impl MainPipeline {
 
         let pipeline_layout_desc = wgpu::PipelineLayoutDescriptor {
             label: Some("Main Pipeline Layout"),
-            bind_group_layouts: &[],
+            bind_group_layouts,
             push_constant_ranges: &[],
         };
 

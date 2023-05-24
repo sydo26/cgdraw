@@ -9,3 +9,5 @@ edition = "2021"
 wgpu = { version = "0.16.0" }
 cgdraw_core = { path = "../cgdraw_core", version = "0.1.0" }
 cgdraw_state = { path = "../cgdraw_state", version = "0.1.0" }
+cgdraw_camera = { path = "../cgdraw_camera", version = "0.1.0" }
+bytemuck = { version = "1.13.1", features = ["derive"] }

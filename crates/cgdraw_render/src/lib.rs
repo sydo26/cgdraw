@@ -4,6 +4,7 @@ mod graphic;
 mod pipeline;
 mod state;
 
+use cgdraw_camera::uniforms::CameraUniform;
 use cgdraw_core::graphic::Texture;
 use cgdraw_state::State;
 pub use graphic::*;
@@ -29,10 +30,35 @@ impl<'a> Render<'a> {
 impl<'a> Render<'a> {
     fn render_pass(self) {
         if let Some(default_view) = self.default_view {
+            // CAMERA ===================
+
+            let camera_buffer =
+                CameraUniform::create_buffer(&self.state.device, self.state.camera.uniform);
+
+            let camera_bind_group_layout =
+                CameraUniform::create_bind_group_layout(&self.state.device);
+            let camera_bind_group = CameraUniform::create_bind_group(
+                &self.state.device,
+                &camera_bind_group_layout,
+                &camera_buffer,
+            );
+
+            self.state.queue.write_buffer(
+                &camera_buffer,
+                0,
+                bytemuck::cast_slice(&[self.state.camera.uniform]),
+            );
+
+            // ===========================
+
             let depth_view =
                 Texture::create_depth_texture(&self.state.device, &self.state.surface_config).view;
-            let main_pipeline =
-                MainPipeline::new(&self.state.device, self.state.surface_config.format);
+
+            let main_pipeline = MainPipeline::new(
+                &self.state.device,
+                self.state.surface_config.format,
+                &[&camera_bind_group_layout],
+            );
 
             let mut encoder =
                 self.state
@@ -73,6 +99,7 @@ impl<'a> Render<'a> {
                 pass.set_stencil_reference(0);
 
                 for vb in self.render_state.buffers.vertices.iter() {
+                    pass.set_bind_group(0, &camera_bind_group, &[]);
                     pass.draw_vertices(vb);
                 }
             }
