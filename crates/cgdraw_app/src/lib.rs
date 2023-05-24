@@ -42,6 +42,10 @@ impl App {
             }
 
             WindowEvent::Redraw => {
+                if let Some(state) = &mut self.state {
+                    state.camera.update(&state.camera_projection);
+                }
+
                 event_handler(AppEvent::Update);
                 if let Some(state) = &self.state {
                     let mut render = Render::new(state, RenderState::default());

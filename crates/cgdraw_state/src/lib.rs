@@ -1,3 +1,5 @@
+use cgdraw_camera::Camera;
+use cgdraw_core::projection::Projection;
 use winit::window::Window;
 
 pub struct State {
@@ -20,6 +22,16 @@ pub struct State {
      * É a configuração da superfície.
      */
     pub surface_config: wgpu::SurfaceConfiguration,
+
+    /**
+     * É a câmera que permite visualizar o cenário 3D.
+     */
+    pub camera: Camera,
+
+    /**
+     * É a projeção que permite visualizar o cenário 3D.
+     */
+    pub camera_projection: Projection,
 }
 
 impl State {
@@ -95,11 +107,23 @@ impl State {
             view_formats: vec![],
         };
 
+        let camera_projection = Projection::new(
+            surface_config.width,
+            surface_config.height,
+            cgmath::Deg(90.0),
+            0.1,
+            100.0,
+        );
+
+        let camera = Camera::new((0.0, 0.0, -1.0), cgmath::Deg(90.0), cgmath::Deg(0.0));
+
         Self {
             device,
             queue,
             surface,
             surface_config,
+            camera,
+            camera_projection,
         }
     }
 }
