@@ -3,7 +3,10 @@ use uniforms::CameraUniform;
 
 pub mod uniforms;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Camera {
+    pub unique_id: &'static str,
+
     /**
      * Define a posição da câmera no espaço
      */
@@ -31,11 +34,13 @@ impl Camera {
         Y: Into<cgmath::Rad<f32>>,
         P: Into<cgmath::Rad<f32>>,
     >(
+        unique_id: &'static str,
         position: V,
         yaw: Y,
         pitch: P,
     ) -> Self {
         Self {
+            unique_id,
             position: position.into(),
             yaw: yaw.into(),
             pitch: pitch.into(),
