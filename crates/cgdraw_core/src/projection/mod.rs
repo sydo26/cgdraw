@@ -34,10 +34,10 @@ pub struct Projection {
 }
 
 impl Projection {
-    pub fn new<F: Into<Rad<f32>>>(width: u32, height: u32, fovy: F, znear: f32, zfar: f32) -> Self {
+    pub fn new(fovy: f32, znear: f32, zfar: f32) -> Self {
         Self {
-            aspect: width as f32 / height as f32,
-            fovy: fovy.into(),
+            aspect: 1.0,
+            fovy: cgmath::Deg(fovy).into(),
             znear,
             zfar,
         }
