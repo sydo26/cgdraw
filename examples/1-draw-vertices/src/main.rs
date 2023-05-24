@@ -1,9 +1,19 @@
-use cgdraw::{event::AppEvent, App, Color};
+use cgdraw::{event::AppEvent, App, CameraInitialAttributes, Color, Projection};
 
 fn main() {
     let app = App::default();
 
-    app.run(move |event| match event {
+    app.add_camera(
+        "camera",
+        CameraInitialAttributes {
+            position: (0.0, 0.0, -1.0),
+            v_rotation: 90.0,
+            h_rotation: 0.0,
+        },
+    )
+    .initial_camera("camera")
+    .camera_projection(Projection::new(120.0, 0.1, 100.0))
+    .run(move |event| match event {
         AppEvent::Setup => {
             println!("Setup!")
         }
