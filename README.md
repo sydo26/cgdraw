@@ -2,8 +2,7 @@
 
 - [x] Configurar o repositório
 - [x] Permitir que ao usar o App, o usuário possa desenhar na tela
-- [ ] Adicionar uma câmera inicial (Sem Ações)
-- [ ] Permitir ao usuário mover a câmera com um controlador.
+- [x] Adicionar uma câmera inicial (Sem Ações)
 - [ ] Permitir ao usuário controlar várias câmeras, podendo alternar entre elas pelo código.
 - [ ] Adicionar funções de translação, rotação e escala para o `Graphics`.
 - [ ] Permitir ao usuário adicionar um modelo 3D importado.
