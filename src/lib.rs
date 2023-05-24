@@ -1,7 +1,10 @@
+pub use cgdraw_app::camera::CameraInitialAttributes;
 pub use cgdraw_app::App;
+
 pub use cgdraw_core::color::Color;
 pub use cgdraw_core::keyboard::keys::VirtualKeyCode;
 
+pub use cgdraw_camera::Camera;
 pub use cgdraw_core::projection::Projection;
 
 pub mod consts {
