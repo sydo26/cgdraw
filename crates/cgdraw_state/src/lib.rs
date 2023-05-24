@@ -1,5 +1,4 @@
 use cgdraw_camera::Camera;
-use cgdraw_core::projection::Projection;
 use winit::window::Window;
 
 pub struct State {
@@ -24,18 +23,13 @@ pub struct State {
     pub surface_config: wgpu::SurfaceConfiguration,
 
     /**
-     * É a câmera que permite visualizar o cenário 3D.
+     * A câmera atual que está sendo usada para visualizar o ambiente 3D.
      */
     pub camera: Camera,
-
-    /**
-     * É a projeção que permite visualizar o cenário 3D.
-     */
-    pub camera_projection: Projection,
 }
 
 impl State {
-    pub async fn new(window: &Window) -> Self {
+    pub async fn new(window: &Window, current_camera: Camera) -> Self {
         let size = window.inner_size();
 
         // Backends: Vulkan, Metal, DX12, DX11, Browser WebGPU e GL
@@ -107,23 +101,12 @@ impl State {
             view_formats: vec![],
         };
 
-        let camera_projection = Projection::new(
-            surface_config.width,
-            surface_config.height,
-            cgmath::Deg(90.0),
-            0.1,
-            100.0,
-        );
-
-        let camera = Camera::new((0.0, 0.0, -1.0), cgmath::Deg(90.0), cgmath::Deg(0.0));
-
         Self {
             device,
             queue,
             surface,
             surface_config,
-            camera,
-            camera_projection,
+            camera: current_camera,
         }
     }
 }
