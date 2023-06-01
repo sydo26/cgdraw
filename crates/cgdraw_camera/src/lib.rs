@@ -39,24 +39,48 @@ impl Camera {
 impl Camera {
 
     /// Rotaciona a câmera.
-    pub fn rotate<V: Into<cgmath::Rad<f32>>, H: Into<cgmath::Rad<f32>>>(&mut self, yaw: V, pitch: H) {
-        let (yaw_sin, yaw_cos) = yaw.into().0.sin_cos();
-        let (pitch_sin, pitch_cos) = pitch.into().0.sin_cos();
+    pub fn rotate(&mut self, dv: cgmath::Deg<f32>, dh: cgmath::Deg<f32>) {
+        let (v, h) = self.get_rotation();
+
+        let vertical_deg: cgmath::Deg<f32> = v.into();
+        let horizontal_deg: cgmath::Deg<f32> = h.into();
+
+        let (y, p): (cgmath::Rad<f32>, cgmath::Rad<f32>) = {
+            (
+                (vertical_deg + dv).into(),
+                (horizontal_deg + dh).into(),
+            )
+        };
+
+        let (yaw_sin, yaw_cos) = y.0.sin_cos();
+        let (pitch_sin, pitch_cos) = p.0.sin_cos();
 
         let direction_vector =
             cgmath::Vector3::new(yaw_cos * pitch_cos, pitch_sin, yaw_sin * pitch_cos).normalize();
 
-        self.target = self.position - direction_vector;
+        self.target = self.position + direction_vector;
     }
 
     /// Faz a câmera rotacionar no eixo vertical em graus.
-    pub fn vertical_rotate<D: Into<cgmath::Rad<f32>>>(&mut self, deg: D) {
+    pub fn vertical_rotate(&mut self, deg: cgmath::Deg<f32>) {
         self.rotate(deg, cgmath::Deg(0.0));
     }
 
     /// Faz a câmera rotacionar no eixo horizontal em graus.
-    pub fn horizontal_rotate<D: Into<cgmath::Rad<f32>>>(&mut self, deg: D) {
+    pub fn horizontal_rotate(&mut self, deg: cgmath::Deg<f32>) {
         self.rotate(cgmath::Deg(0.0),deg );
+    }
+
+    /// Pega o estado da rotação atual da câmera
+    pub fn get_rotation(&self) -> (cgmath::Rad<f32>, cgmath::Rad<f32>) {
+        let direction_vector = (self.target - self.position).normalize();
+
+        let yaw = direction_vector.z.atan2(direction_vector.x);
+        let pitch = (direction_vector.y / (direction_vector.x.powi(2) + direction_vector.z.powi(2)).sqrt()).atan();
+
+
+
+        (cgmath::Rad(yaw), cgmath::Rad(pitch))
     }
 }
 
@@ -102,6 +126,8 @@ impl Camera {
 
     /// Calcula a matriz4x4 gerada pela câmera
     fn calc_matrix(&self) -> cgmath::Matrix4<f32> {
+        // println!("Camera: {:?}", self.target);
+
         self.look_to_rh(
             self.position,
             self.target,
