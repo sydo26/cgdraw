@@ -1,4 +1,8 @@
-use crate::{num::BaseFloat, vector::Vec4};
+use crate::{
+    angle::Rad,
+    num::BaseFloat,
+    vector::{Vec3, Vec4},
+};
 
 pub struct Matrix4x4<T> {
     pub c0: Vec4<T>,
@@ -40,17 +44,17 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
-    pub fn from_translate(x: T, y: T, z: T) -> Self {
+    pub fn from_translate(xyz: Vec3<T>) -> Self {
         Self::from_cols(
             Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
             Vec4::new(T::zero(), T::one(), T::zero(), T::zero()),
             Vec4::new(T::zero(), T::zero(), T::one(), T::zero()),
-            Vec4::new(x, y, z, T::one()),
+            Vec4::new(xyz.x, xyz.y, xyz.z, T::one()),
         )
     }
 
-    pub fn from_rotate_x(angle: T) -> Self {
-        let (sin, cos) = angle.sin_cos();
+    pub fn from_rotate_x(angle: Rad<T>) -> Self {
+        let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
             Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
             Vec4::new(T::zero(), cos, sin, T::zero()),
@@ -59,8 +63,8 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
-    pub fn from_rotate_y(angle: T) -> Self {
-        let (sin, cos) = angle.sin_cos();
+    pub fn from_rotate_y(angle: Rad<T>) -> Self {
+        let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
             Vec4::new(cos, T::zero(), -sin, T::zero()),
             Vec4::new(T::zero(), T::one(), T::zero(), T::zero()),
@@ -69,8 +73,8 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
-    pub fn from_rotate_z(angle: T) -> Self {
-        let (sin, cos) = angle.sin_cos();
+    pub fn from_rotate_z(angle: Rad<T>) -> Self {
+        let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
             Vec4::new(cos, sin, T::zero(), T::zero()),
             Vec4::new(-sin, cos, T::zero(), T::zero()),
