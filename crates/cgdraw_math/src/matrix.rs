@@ -4,6 +4,7 @@ use crate::{
     vector::{Vec3, Vec4},
 };
 
+/// Matriz 4x4, onde cada coluna é um vetor de 4 elementos.
 pub struct Matrix4x4<T> {
     pub c0: Vec4<T>,
     pub c1: Vec4<T>,
@@ -12,6 +13,7 @@ pub struct Matrix4x4<T> {
 }
 
 impl<T> Matrix4x4<T> {
+    /// Cria uma matriz 4x4 a partir de 16 elementos.
     #[inline]
     #[rustfmt::skip]
     #[allow(clippy::too_many_arguments)]
@@ -29,12 +31,14 @@ impl<T> Matrix4x4<T> {
         )
     }
 
+    /// Cria uma matriz 4x4 a partir de 4 vetores de 4 elementos.
     pub fn from_cols(c0: Vec4<T>, c1: Vec4<T>, c2: Vec4<T>, c3: Vec4<T>) -> Self {
         Self { c0, c1, c2, c3 }
     }
 }
 
 impl<T: BaseFloat> Matrix4x4<T> {
+    /// Cria uma matriz identidade.
     pub fn identity() -> Self {
         Self::from_cols(
             Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
@@ -44,6 +48,7 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
+    /// Cria uma matriz de translação a partir de um vetor de 3 elementos (x, y, z).
     pub fn from_translate(xyz: Vec3<T>) -> Self {
         Self::from_cols(
             Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
@@ -53,6 +58,7 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
+    /// Cria uma matriz de rotação do eixo X a partir de um ângulo em radianos.
     pub fn from_rotate_x(angle: Rad<T>) -> Self {
         let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
@@ -63,6 +69,7 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
+    /// Cria uma matriz de rotação do eixo Y a partir de um ângulo em radianos.
     pub fn from_rotate_y(angle: Rad<T>) -> Self {
         let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
@@ -73,6 +80,7 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
+    /// Cria uma matriz de rotação do eixo Z a partir de um ângulo em radianos.
     pub fn from_rotate_z(angle: Rad<T>) -> Self {
         let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
@@ -83,6 +91,7 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
+    /// Cria uma matriz de escala a partir de um vetor de 3 elementos (x, y, z).
     pub fn from_scale(x: T, y: T, z: T) -> Self {
         Self::from_cols(
             Vec4::new(x, T::zero(), T::zero(), T::zero()),
