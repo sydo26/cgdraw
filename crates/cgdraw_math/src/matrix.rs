@@ -92,11 +92,11 @@ impl<T: BaseFloat> Matrix4x4<T> {
     }
 
     /// Cria uma matriz de escala a partir de um vetor de 3 elementos (x, y, z).
-    pub fn from_scale(x: T, y: T, z: T) -> Self {
+    pub fn from_scale(xyz: Vec3<T>) -> Self {
         Self::from_cols(
-            Vec4::new(x, T::zero(), T::zero(), T::zero()),
-            Vec4::new(T::zero(), y, T::zero(), T::zero()),
-            Vec4::new(T::zero(), T::zero(), z, T::zero()),
+            Vec4::new(xyz.x, T::zero(), T::zero(), T::zero()),
+            Vec4::new(T::zero(), xyz.y, T::zero(), T::zero()),
+            Vec4::new(T::zero(), T::zero(), xyz.z, T::zero()),
             Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
         )
     }
