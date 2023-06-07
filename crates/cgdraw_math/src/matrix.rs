@@ -65,7 +65,7 @@ impl<T: BaseFloat> Matrix4x4<T> {
     ///     [1, 0,   0,    0],
     ///     [0, cos, sin,  0],
     ///     [0, -sin, cos, 0],
-    ///     [0, 0,   0,    0],
+    ///     [0, 0,   0,    1],
     /// ]
     /// ```
     pub fn from_rotate_x(angle: Rad<T>) -> Self {
@@ -91,9 +91,9 @@ impl<T: BaseFloat> Matrix4x4<T> {
     pub fn from_rotate_y(angle: Rad<T>) -> Self {
         let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
-            Vec4::new(cos, T::zero(), -sin, T::zero()),
+            Vec4::new(cos, T::zero(), sin, T::zero()),
             Vec4::new(T::zero(), T::one(), T::zero(), T::zero()),
-            Vec4::new(sin, T::zero(), cos, T::zero()),
+            Vec4::new(-sin, T::zero(), cos, T::zero()),
             Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
         )
     }
