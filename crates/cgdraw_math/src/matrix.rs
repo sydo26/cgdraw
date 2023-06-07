@@ -1,4 +1,4 @@
-use crate::vector::Vec4;
+use crate::{num::BaseFloat, vector::Vec4};
 
 pub struct Matrix4x4<T> {
     pub c0: Vec4<T>,
@@ -27,5 +27,64 @@ impl<T> Matrix4x4<T> {
 
     pub fn from_cols(c0: Vec4<T>, c1: Vec4<T>, c2: Vec4<T>, c3: Vec4<T>) -> Self {
         Self { c0, c1, c2, c3 }
+    }
+}
+
+impl<T: BaseFloat> Matrix4x4<T> {
+    pub fn identity() -> Self {
+        Self::from_cols(
+            Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
+            Vec4::new(T::zero(), T::one(), T::zero(), T::zero()),
+            Vec4::new(T::zero(), T::zero(), T::one(), T::zero()),
+            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
+        )
+    }
+
+    pub fn from_translate(x: T, y: T, z: T) -> Self {
+        Self::from_cols(
+            Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
+            Vec4::new(T::zero(), T::one(), T::zero(), T::zero()),
+            Vec4::new(T::zero(), T::zero(), T::one(), T::zero()),
+            Vec4::new(x, y, z, T::one()),
+        )
+    }
+
+    pub fn from_rotate_x(angle: T) -> Self {
+        let (sin, cos) = angle.sin_cos();
+        Self::from_cols(
+            Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
+            Vec4::new(T::zero(), cos, sin, T::zero()),
+            Vec4::new(T::zero(), -sin, cos, T::zero()),
+            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
+        )
+    }
+
+    pub fn from_rotate_y(angle: T) -> Self {
+        let (sin, cos) = angle.sin_cos();
+        Self::from_cols(
+            Vec4::new(cos, T::zero(), -sin, T::zero()),
+            Vec4::new(T::zero(), T::one(), T::zero(), T::zero()),
+            Vec4::new(sin, T::zero(), cos, T::zero()),
+            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
+        )
+    }
+
+    pub fn from_rotate_z(angle: T) -> Self {
+        let (sin, cos) = angle.sin_cos();
+        Self::from_cols(
+            Vec4::new(cos, sin, T::zero(), T::zero()),
+            Vec4::new(-sin, cos, T::zero(), T::zero()),
+            Vec4::new(T::zero(), T::zero(), T::one(), T::zero()),
+            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
+        )
+    }
+
+    pub fn from_scale(x: T, y: T, z: T) -> Self {
+        Self::from_cols(
+            Vec4::new(x, T::zero(), T::zero(), T::zero()),
+            Vec4::new(T::zero(), y, T::zero(), T::zero()),
+            Vec4::new(T::zero(), T::zero(), z, T::zero()),
+            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
+        )
     }
 }
