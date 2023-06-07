@@ -48,7 +48,7 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
-    /// Cria uma matriz de translação a partir de um vetor de 3 elementos (x, y, z).
+    /// Cria uma matriz 4x4 de translação a partir de um vetor de 3 elementos (x, y, z).
     pub fn from_translate(xyz: Vec3<T>) -> Self {
         Self::from_cols(
             Vec4::new(T::one(), T::zero(), T::zero(), T::zero()),
@@ -58,7 +58,16 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
-    /// Cria uma matriz de rotação do eixo X a partir de um ângulo em radianos.
+    /// Cria uma matriz 4x4 de rotação do eixo X a partir de um ângulo em radianos.
+    /// ```rust
+    /// // Matriz Transposta
+    /// [
+    ///     [1, 0,   0,    0],
+    ///     [0, cos, sin,  0],
+    ///     [0, -sin, cos, 0],
+    ///     [0, 0,   0,    0],
+    /// ]
+    /// ```
     pub fn from_rotate_x(angle: Rad<T>) -> Self {
         let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
@@ -69,7 +78,16 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
-    /// Cria uma matriz de rotação do eixo Y a partir de um ângulo em radianos.
+    /// Cria uma matriz 4x4 de rotação do eixo Y a partir de um ângulo em radianos.
+    /// ```rust
+    /// // Matriz Transposta
+    /// [
+    ///     [cos,  0, sin,  0],
+    ///     [0,    1, 0,    0],
+    ///     [-sin, 0, cos,  0],
+    ///     [0,    0, 0,    1],
+    /// ]
+    /// ```
     pub fn from_rotate_y(angle: Rad<T>) -> Self {
         let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
@@ -80,7 +98,16 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
-    /// Cria uma matriz de rotação do eixo Z a partir de um ângulo em radianos.
+    /// Cria uma matriz 4x4 de rotação do eixo Z a partir de um ângulo em radianos.
+    /// ```rust
+    /// // Matriz Transposta
+    /// [
+    ///     [cos,  sin, 0, 0],
+    ///     [-sin, cos, 0, 0],
+    ///     [0,    0,   1, 0],
+    ///     [0,    0,   0, 1],
+    /// ]
+    /// ```
     pub fn from_rotate_z(angle: Rad<T>) -> Self {
         let (sin, cos) = angle.0.sin_cos();
         Self::from_cols(
@@ -91,7 +118,16 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
-    /// Cria uma matriz de escala a partir de um vetor de 3 elementos (x, y, z).
+    /// Cria uma matriz 4x4 de escala a partir de um vetor de 3 elementos (x, y, z).
+    /// ```rust
+    /// // Matriz Transposta
+    /// [
+    ///     [x, 0, 0, 0],
+    ///     [0, y, 0, 0],
+    ///     [0, 0, z, 0],
+    ///     [0, 0, 0, 1],
+    /// ]
+    /// ```
     pub fn from_scale(xyz: Vec3<T>) -> Self {
         Self::from_cols(
             Vec4::new(xyz.x, T::zero(), T::zero(), T::zero()),
