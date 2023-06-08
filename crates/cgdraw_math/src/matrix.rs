@@ -1,6 +1,7 @@
 use crate::{
     angle::Rad,
     num::BaseFloat,
+    point::Point3,
     vector::{Vec3, Vec4},
 };
 
@@ -40,6 +41,54 @@ impl<T> Matrix4x4<T> {
 }
 
 impl<T: BaseFloat> Matrix4x4<T> {
+    /// Cria uma matriz de transformação que mira a partir de um ponto de origem `eye`, para um
+    /// vetor de direção `dir`, usando o vetor `up` como orientação de referência.
+    pub fn look_at_rh(eye: Point3<T>, direction: Vec3<T>, up: Vec3<T>) -> Matrix4x4<T> {
+        // O vetor direção representa o eixo Z da câmera. Para sabermos qual eixo
+        let dir = direction.normalize();
+
+        // O vetor direito representa o eixo horizontal da câmera. Para sabermos
+        // qual eixo é o horizontal, precisamos de um vetor indicando qual é o eixo
+        // vertical da câmera. Nesse caso, o vetor up. Se o vetor up for o eixo Y,
+        // o meu eixo horizontal será o eixo X.
+        let right = up.cross(dir).normalize();
+
+        // Aqui basicamente estamos capturando o vetor up da câmera. O vetor up
+        // é o vetor que aponta para cima, ou seja, o eixo Y.
+        let up = dir.cross(right);
+
+        // Look-at right handed matrix
+        //  rx   ry   rz  0
+        //  ux   uy   uz  0
+        //  dx   dy   dz  0
+        //  0    0    0   1
+        let look_at_matrix = Matrix4x4::new(
+            // Line 01
+            right.x,
+            up.x,
+            dir.x,
+            T::zero(), //
+            // Line 02
+            right.y,
+            up.y,
+            dir.y,
+            T::zero(),
+            // Line 03
+            right.z,
+            up.z,
+            dir.z,
+            T::zero(), //
+            // Line 04
+            T::zero(),
+            T::zero(),
+            T::zero(),
+            T::one(),
+        );
+
+        // Multiplicação da matriz de look-at com a matriz de translação
+        look_at_matrix * Self::from_translate(Vec3::new(-eye.x, -eye.y, -eye.z))
+    }
+
     /// Cria uma matriz identidade.
     pub fn identity() -> Self {
         Self::from_cols(
