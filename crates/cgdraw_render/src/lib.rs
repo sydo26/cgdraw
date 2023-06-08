@@ -1,14 +1,10 @@
 use std::iter::once;
 
 mod graphic;
-mod pipeline;
 mod state;
 
-use cgdraw_camera::uniforms::CameraUniform;
-use cgdraw_core::graphic::Texture;
 use cgdraw_state::State;
 pub use graphic::*;
-pub use pipeline::*;
 pub use state::*;
 
 pub struct Render<'a> {
@@ -32,33 +28,13 @@ impl<'a> Render<'a> {
         if let Some(default_view) = self.default_view {
             // CAMERA ===================
 
-            let camera_buffer =
-                CameraUniform::create_buffer(&self.state.device, self.state.camera.uniform);
-
-            let camera_bind_group_layout =
-                CameraUniform::create_bind_group_layout(&self.state.device);
-            let camera_bind_group = CameraUniform::create_bind_group(
-                &self.state.device,
-                &camera_bind_group_layout,
-                &camera_buffer,
-            );
-
             self.state.queue.write_buffer(
-                &camera_buffer,
+                &self.state.camera_buffer,
                 0,
-                bytemuck::cast_slice(&[self.state.camera.uniform]),
+                bytemuck::cast_slice(&[self.state.camera_uniform]),
             );
 
             // ===========================
-
-            let depth_view =
-                Texture::create_depth_texture(&self.state.device, &self.state.surface_config).view;
-
-            let main_pipeline = MainPipeline::new(
-                &self.state.device,
-                self.state.surface_config.format,
-                &[&camera_bind_group_layout],
-            );
 
             let mut encoder =
                 self.state
@@ -67,39 +43,39 @@ impl<'a> Render<'a> {
                         label: Some("Command Encoder"),
                     });
 
-            let desc = wgpu::RenderPassDescriptor {
-                label: Some("Render Pass"),
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &default_view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
-                            a: 1.0,
-                        }),
-                        store: true,
-                    },
-                })],
-                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: &depth_view,
-                    depth_ops: Some(wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(1.0),
-                        store: true,
-                    }),
-                    stencil_ops: None,
-                }),
-            };
-
             {
+                let desc = wgpu::RenderPassDescriptor {
+                    label: Some("Render Pass"),
+                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                        view: &default_view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(wgpu::Color {
+                                r: 0.1,
+                                g: 0.2,
+                                b: 0.3,
+                                a: 1.0,
+                            }),
+                            store: true,
+                        },
+                    })],
+                    depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                        view: &self.state.depth_view,
+                        depth_ops: Some(wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(1.0),
+                            store: true,
+                        }),
+                        stencil_ops: None,
+                    }),
+                };
+
                 let mut pass = encoder.begin_render_pass(&desc);
 
-                pass.set_pipeline(&main_pipeline.pipeline);
-                pass.set_stencil_reference(0);
+                // pass.set_stencil_reference(0);
 
                 for vb in self.render_state.buffers.vertices.iter() {
-                    pass.set_bind_group(0, &camera_bind_group, &[]);
+                    pass.set_pipeline(&self.state.main_pipeline.pipeline);
+                    pass.set_bind_group(0, &self.state.camera_bind_group, &[]);
                     pass.draw_vertices(vb);
                 }
             }
@@ -124,11 +100,10 @@ impl<'a> Render<'a> {
             }
         };
 
-        self.default_view = Some(
-            frame
-                .texture
-                .create_view(&wgpu::TextureViewDescriptor::default()),
-        );
+        self.default_view = Some(frame.texture.create_view(&wgpu::TextureViewDescriptor {
+            format: Some(self.state.surface_config.format),
+            ..wgpu::TextureViewDescriptor::default()
+        }));
 
         self.render_pass();
 
