@@ -4,6 +4,8 @@ use crate::{
     vector::{Vec3, Vec4},
 };
 
+use std::mem;
+
 /// Matriz 4x4, onde cada coluna é um vetor de 4 elementos.
 pub struct Matrix4x4<T> {
     pub c0: Vec4<T>,
@@ -137,3 +139,86 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 }
+
+// macro_rules! impl_matrix {
+//     ($MatrixN:ident, $VectorN:ident { $($field:ident : $row_index:expr),+ }) => {};
+// }
+
+macro_rules! fixed_array_conversions {
+    ($MatrixN:ident <$S:ident> { $($field:ident : $index:expr),+ }, $n:expr) => {
+        #[allow(clippy::from_over_into)]
+        impl<$S> Into<[[$S; $n]; $n]> for $MatrixN<$S> {
+            #[inline]
+            fn into(self) -> [[$S; $n]; $n] {
+                match self { $MatrixN { $($field),+ } => [$($field.into()),+] }
+            }
+        }
+
+        impl<$S> AsRef<[[$S; $n]; $n]> for $MatrixN<$S> {
+            #[inline]
+            fn as_ref(&self) -> &[[$S; $n]; $n] {
+                unsafe { mem::transmute(self) }
+            }
+        }
+
+        impl<$S> AsMut<[[$S; $n]; $n]> for $MatrixN<$S> {
+            #[inline]
+            fn as_mut(&mut self) -> &mut [[$S; $n]; $n] {
+                unsafe { mem::transmute(self) }
+            }
+        }
+
+        impl<$S: Copy> From<[[$S; $n]; $n]> for $MatrixN<$S> {
+            #[inline]
+            fn from(m: [[$S; $n]; $n]) -> $MatrixN<$S> {
+                // We need to use a copy here because we can't pattern match on arrays yet
+                $MatrixN { $($field: From::from(m[$index])),+ }
+            }
+        }
+
+        impl<'a, $S> From<&'a [[$S; $n]; $n]> for &'a $MatrixN<$S> {
+            #[inline]
+            fn from(m: &'a [[$S; $n]; $n]) -> &'a $MatrixN<$S> {
+                unsafe { mem::transmute(m) }
+            }
+        }
+
+        impl<'a, $S> From<&'a mut [[$S; $n]; $n]> for &'a mut $MatrixN<$S> {
+            #[inline]
+            fn from(m: &'a mut [[$S; $n]; $n]) -> &'a mut $MatrixN<$S> {
+                unsafe { mem::transmute(m) }
+            }
+        }
+
+        impl<$S> AsRef<[$S; ($n * $n)]> for $MatrixN<$S> {
+            #[inline]
+            fn as_ref(&self) -> &[$S; ($n * $n)] {
+                unsafe { mem::transmute(self) }
+            }
+        }
+
+        impl<$S> AsMut<[$S; ($n * $n)]> for $MatrixN<$S> {
+            #[inline]
+            fn as_mut(&mut self) -> &mut [$S; ($n * $n)] {
+                unsafe { mem::transmute(self) }
+            }
+        }
+
+
+        impl<'a, $S> From<&'a [$S; ($n * $n)]> for &'a $MatrixN<$S> {
+            #[inline]
+            fn from(m: &'a [$S; ($n * $n)]) -> &'a $MatrixN<$S> {
+                unsafe { mem::transmute(m) }
+            }
+        }
+
+        impl<'a, $S> From<&'a mut [$S; ($n * $n)]> for &'a mut $MatrixN<$S> {
+            #[inline]
+            fn from(m: &'a mut [$S; ($n * $n)]) -> &'a mut $MatrixN<$S> {
+                unsafe { mem::transmute(m) }
+            }
+        }
+    }
+}
+
+fixed_array_conversions!(Matrix4x4<T> { c0: 0, c1: 1, c2: 2, c3: 3 }, 4);
