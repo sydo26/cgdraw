@@ -1,26 +1,24 @@
+use cgdraw_math::matrix::Matrix4x4;
 use wgpu::util::DeviceExt;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
-pub struct CameraUniform {
+pub struct CameraUniformFloat32 {
     pub view_proj: [[f32; 4]; 4],
     pub view_position: [f32; 4],
 }
 
-impl Default for CameraUniform {
+impl Default for CameraUniformFloat32 {
     fn default() -> Self {
-        use cgmath::SquareMatrix;
         Self {
             view_position: [0.0; 4],
-            view_proj: cgmath::Matrix4::identity().into(),
+            view_proj: Matrix4x4::identity().into(),
         }
     }
 }
 
-impl CameraUniform {
-    /**
-     * Cria um buffer para a câmera
-     */
+impl CameraUniformFloat32 {
+    /// Cria um buffer da câmera para enviar para o shader.
     pub fn create_buffer(device: &wgpu::Device, uniform: Self) -> wgpu::Buffer {
         device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Camera Buffer"),
@@ -29,9 +27,7 @@ impl CameraUniform {
         })
     }
 
-    /**
-     * Cria um layout para a câmera
-     */
+    /// Cria um `bind_group_layout` para a câmera, que será usado para criar um `bind_group`.
     pub fn create_bind_group_layout(device: &wgpu::Device) -> wgpu::BindGroupLayout {
         device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             entries: &[wgpu::BindGroupLayoutEntry {
@@ -48,9 +44,7 @@ impl CameraUniform {
         })
     }
 
-    /**
-     * Cria um bind group para a câmera
-     */
+    /// Cria um `bind_group` para a câmera, que será usado pelo `render_pipeline`.
     pub fn create_bind_group(
         device: &wgpu::Device,
         layout: &wgpu::BindGroupLayout,
