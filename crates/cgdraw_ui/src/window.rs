@@ -83,7 +83,7 @@ impl Window {
         }
 
         self.event_loop.run(move |event, _, control_flow| {
-            *control_flow = event_loop::ControlFlow::Wait;
+            *control_flow = event_loop::ControlFlow::Poll;
 
             match event {
                 event::Event::MainEventsCleared => {
@@ -135,7 +135,6 @@ impl Window {
                 event::Event::Resumed => {
                     handler(WindowEvent::Resumed);
                 }
-
                 _ => (),
             }
         });
