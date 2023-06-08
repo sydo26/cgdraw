@@ -4,6 +4,7 @@ use std::ops::*;
 
 use num_traits::{Float, Zero};
 
+use crate::angle::Rad;
 use crate::num::BaseNum;
 
 #[repr(C)]
@@ -56,6 +57,54 @@ impl<T: BaseNum> Vec3<T> {
     #[inline]
     pub fn truncate(self) -> Vec2<T> {
         Vec2::new(self.x, self.y)
+    }
+
+    /// Calcula a magnitude2 do vetor.
+    #[inline]
+    pub fn magnitude2(self) -> T {
+        Self::dot(self, self)
+    }
+
+    /// Calcula a magnitude do vetor.
+    #[inline]
+    pub fn magnitude(self) -> T
+    where
+        T: Float,
+    {
+        self.magnitude2().sqrt()
+    }
+
+    /// Calcula o produto escalar entre dois vetores.
+    #[inline]
+    pub fn dot(self, other: Vec3<T>) -> T {
+        Vec3::mul(self, other).sum()
+    }
+
+    /// Calcula o ângulo entre dois vetores.
+    #[inline]
+    pub fn angle(self, other: Vec3<T>) -> Rad<T>
+    where
+        T: Float,
+    {
+        Rad(self.cross(other).magnitude().atan2(Self::dot(self, other)))
+    }
+
+    /// Normaliza o vetor para uma magnitude especificada.
+    #[inline]
+    pub fn normalize_to(self, magnitude: T) -> Vec3<T>
+    where
+        T: Float,
+    {
+        self * (magnitude / self.magnitude())
+    }
+
+    /// Normaliza o vetor para uma magnitude de 1.
+    #[inline]
+    pub fn normalize(self) -> Vec3<T>
+    where
+        T: Float,
+    {
+        self.normalize_to(T::one())
     }
 }
 
