@@ -1,5 +1,9 @@
-use cgdraw_camera::Camera;
+use cgdraw_camera::uniform::CameraUniformFloat32;
+use cgdraw_core::graphic::Texture;
+use pipeline::MainPipeline;
 use winit::window::Window;
+
+mod pipeline;
 
 pub struct State {
     /**
@@ -22,24 +26,49 @@ pub struct State {
      */
     pub surface_config: wgpu::SurfaceConfiguration,
 
+    // /**
+    //  * A câmera atual que está sendo usada para visualizar o ambiente 3D.
+    //  */
+    // pub camera: Camera,
     /**
-     * A câmera atual que está sendo usada para visualizar o ambiente 3D.
+     * O uniform da câmera que será usado para enviar os dados da câmera para o shader.
      */
-    pub camera: Camera,
+    pub camera_uniform: CameraUniformFloat32,
+
+    /**
+     * O buffer da câmera que será usado para enviar os dados da câmera para o shader.
+     */
+    pub camera_buffer: wgpu::Buffer,
+
+    /**
+     * O layout do grupo de ligação da câmera que será usado para criar o grupo de ligação da câmera.
+     */
+    pub camera_bind_group_layout: wgpu::BindGroupLayout,
+
+    /**
+     * O grupo de ligação da câmera que será usado para enviar os dados da câmera para o shader.
+     */
+    pub camera_bind_group: wgpu::BindGroup,
+
+    /**
+     * O pipeline principal que será usado para renderizar os gráficos.
+     */
+    pub main_pipeline: MainPipeline,
+
+    /**
+     * A textura de profundidade que será usada para renderizar os gráficos.
+     */
+    pub depth_view: wgpu::TextureView,
 }
 
 impl State {
-    pub async fn new(window: &Window, current_camera: Camera) -> Self {
+    pub async fn new(window: &Window, camera_uniform: CameraUniformFloat32) -> Self {
         let size = window.inner_size();
 
         // Backends: Vulkan, Metal, DX12, DX11, Browser WebGPU e GL
         // Usado para criar o dispositivo e a fila de comandos.
         let backends = wgpu::Backends::all();
 
-        // let dx12_shader_compiler = wgpu::Dx12Compiler::Dxc {
-        //     dxil_path: None,
-        //     dxc_path: None,
-        // };
         let dx12_shader_compiler = Default::default();
 
         let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
@@ -49,14 +78,6 @@ impl State {
 
         let surface = unsafe { instance.create_surface(window) }.unwrap();
 
-        // let adapter = instance
-        //     .enumerate_adapters(backends)
-        //     .filter(|adapter| {
-        //         // Verifica se o adaptador suporta a superfície usada.
-        //         adapter.is_surface_supported(&surface)
-        //     })
-        //     .next()
-        //     .unwrap();
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptionsBase {
                 power_preference: wgpu::PowerPreference::default(),
@@ -101,12 +122,30 @@ impl State {
             view_formats: vec![],
         };
 
+        let camera_buffer = CameraUniformFloat32::create_buffer(&device, camera_uniform);
+        let camera_bind_group_layout = CameraUniformFloat32::create_bind_group_layout(&device);
+        let camera_bind_group = CameraUniformFloat32::create_bind_group(
+            &device,
+            &camera_bind_group_layout,
+            &camera_buffer,
+        );
+
+        let main_pipeline =
+            MainPipeline::new(&device, surface_config.format, &[&camera_bind_group_layout]);
+
+        let depth_view = Texture::create_depth_texture(&device, &surface_config).view;
+
         Self {
             device,
             queue,
             surface,
             surface_config,
-            camera: current_camera,
+            camera_uniform,
+            camera_buffer,
+            camera_bind_group_layout,
+            camera_bind_group,
+            main_pipeline,
+            depth_view,
         }
     }
 }
