@@ -6,58 +6,34 @@ use winit::window::Window;
 mod pipeline;
 
 pub struct State {
-    /**
-     * É o dispositivo que permite criar recursos como buffers e texturas.
-     */
+    /// É o dispositivo que permite criar recursos como buffers e texturas.
     pub device: wgpu::Device,
 
-    /**
-     * É a fila de comandos que permite enviar comandos para o dispositivo.
-     */
+    /// É a fila de comandos que permite enviar comandos para o dispositivo.
     pub queue: wgpu::Queue,
 
-    /**
-     * É a superfície que permite renderizar os gráficos.
-     */
+    /// É a superfície que permite renderizar os gráficos.
     pub surface: wgpu::Surface,
 
-    /**
-     * É a configuração da superfície.
-     */
+    /// É a configuração da superfície.
     pub surface_config: wgpu::SurfaceConfiguration,
 
-    // /**
-    //  * A câmera atual que está sendo usada para visualizar o ambiente 3D.
-    //  */
-    // pub camera: Camera,
-    /**
-     * O uniform da câmera que será usado para enviar os dados da câmera para o shader.
-     */
+    /// O uniform da câmera que será usado para enviar os dados da câmera para o shader.
     pub camera_uniform: CameraUniformFloat32,
 
-    /**
-     * O buffer da câmera que será usado para enviar os dados da câmera para o shader.
-     */
+    /// O buffer da câmera que será usado para enviar os dados da câmera para o shader.
     pub camera_buffer: wgpu::Buffer,
 
-    /**
-     * O layout do grupo de ligação da câmera que será usado para criar o grupo de ligação da câmera.
-     */
+    /// O layout do grupo de ligação da câmera que será usado para criar o grupo de ligação da câmera.
     pub camera_bind_group_layout: wgpu::BindGroupLayout,
 
-    /**
-     * O grupo de ligação da câmera que será usado para enviar os dados da câmera para o shader.
-     */
+    /// O grupo de ligação da câmera que será usado para enviar os dados da câmera para o shader.
     pub camera_bind_group: wgpu::BindGroup,
 
-    /**
-     * O pipeline principal que será usado para renderizar os gráficos.
-     */
+    /// O pipeline principal que será usado para renderizar os gráficos.
     pub main_pipeline: MainPipeline,
 
-    /**
-     * A textura de profundidade que será usada para renderizar os gráficos.
-     */
+    /// A textura de profundidade que será usada para renderizar os gráficos.
     pub depth_view: wgpu::TextureView,
 }
 

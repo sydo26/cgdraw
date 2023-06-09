@@ -1,36 +1,67 @@
-use camera::CameraInitialAttributes;
-use cgdraw_camera::Camera;
-use cgdraw_core::projection::Projection;
+use std::{collections::HashMap, time::Instant};
+
+use cgdraw_camera::{uniform::CameraUniformFloat32, Camera};
+use cgdraw_core::graphic::Texture;
 use cgdraw_render::{Render, RenderState};
 use cgdraw_state::State;
 use cgdraw_ui::window::{Window, WindowEvent};
 use events::AppEvent;
 use graphics::Graphics;
+use handler::AppHandler;
+use uuid::Uuid;
 
-pub mod camera;
 pub mod events;
 pub mod graphics;
+pub mod handler;
 
-pub struct App {
-    window: Window,
-    state: Option<State>,
-    cameras: Vec<Camera>,
-    current_camera: Option<Camera>,
-    camera_projection: Option<Projection>,
+struct AppCamera {
+    camera: Box<dyn Camera<f32> + 'static>,
+    selected: bool,
 }
 
-impl Default for App {
-    fn default() -> Self {
-        let window = Window::default();
+impl AppCamera {
+    #[inline]
+    fn update_camera(&mut self, state: &mut State) {
+        let view_proj = self.camera.calc_view_proj();
 
-        Self {
+        // state.camera_uniform.view_position = [0.0; 4];
+        state.camera_uniform.view_proj = view_proj.into();
+    }
+}
+
+pub struct AppBuilder {
+    cameras: HashMap<String, AppCamera>,
+}
+
+impl AppBuilder {
+    /// Adiciona uma nova implementação de câmera ao aplicativo.
+    #[inline]
+    pub fn add_camera(mut self, camera: impl Camera<f32> + 'static) {
+        self.cameras.insert(
+            Uuid::new_v4().to_string(),
+            AppCamera {
+                camera: Box::new(camera),
+                selected: self.cameras.is_empty(),
+            },
+        );
+    }
+
+    /// Constrói o aplicativo.
+    #[inline]
+    pub fn build(self, window: Window) -> App {
+        if self.cameras.is_empty() {
+            panic!("Nenhuma câmera foi adicionada ao aplicativo!");
+        }
+
+        App {
             window,
-            state: None,
-            cameras: Vec::new(),
-            current_camera: None,
-            camera_projection: None,
+            cameras: self.cameras,
         }
     }
+}
+pub struct App {
+    window: Window,
+    cameras: HashMap<String, AppCamera>,
 }
 
 impl App {
@@ -38,58 +69,81 @@ impl App {
     where
         F: 'static + FnMut(AppEvent),
     {
-        if self.cameras.is_empty() {
-            panic!("Nenhuma câmera foi adicionada ao aplicativo!");
-        }
+        let mut state = State::new(&self.window.window, CameraUniformFloat32::default()).await;
 
-        if self.current_camera.is_none() {
-            panic!("Nenhuma câmera inicial foi definida!");
-        }
+        let mut last_render_time = Instant::now();
 
-        self.state = Some(State::new(&self.window.window, self.current_camera.unwrap()).await);
+        self.window.run(move |window_event| {
+            fn update_camera(cameras: &mut HashMap<String, AppCamera>, state: &mut State) {
+                cameras
+                    .iter_mut()
+                    .find(|(_, camera)| camera.selected)
+                    .as_mut()
+                    .unwrap()
+                    .1
+                    .update_camera(state);
+            }
 
-        self.window.run(move |window_event| match window_event {
-            WindowEvent::Resumed => {
-                event_handler(AppEvent::Setup);
+            match window_event {
+                WindowEvent::Resumed => {
+                    event_handler(AppEvent::Setup);
 
-                if let Some(state) = &mut self.state {
                     state
                         .surface
                         .configure(&state.device, &state.surface_config);
                 }
-            }
 
-            WindowEvent::Redraw => {
-                if let Some(state) = &mut self.state {
-                    if let Some(proj) = &mut self.camera_projection {
-                        proj.resize(state.surface_config.width, state.surface_config.height);
-                        state.camera.update(proj);
-                    }
-                }
+                WindowEvent::Redraw => {
+                    let now = Instant::now();
+                    let delta_time = now - last_render_time;
+                    last_render_time = now;
 
-                event_handler(AppEvent::Update);
-                if let Some(state) = &self.state {
-                    let mut render = Render::new(state, RenderState::default());
+                    //     proj.resize(state.surface_config.width, state.surface_config.height);
 
-                    let graphics = &mut Graphics::new(&mut render.render_state, state);
+                    // Update Camera
+                    update_camera(&mut self.cameras, &mut state);
+
+                    let handler = &mut AppHandler::new(&mut state);
+
+                    event_handler(AppEvent::Update {
+                        handler,
+                        delta_time,
+                    });
+
+                    let mut render = Render::new(&state, RenderState::default());
+
+                    let graphics = &mut Graphics::new(&mut render.render_state, &state);
                     event_handler(AppEvent::Draw { graphics });
 
                     render.build();
                 }
+
+                WindowEvent::Close => event_handler(AppEvent::Finished),
+
+                WindowEvent::Resize { size } => {
+                    if size.width > 0 && size.height > 0 {
+                        state.surface_config.width = size.width;
+                        state.surface_config.height = size.height;
+                        state
+                            .surface
+                            .configure(&state.device, &state.surface_config);
+                        state.depth_view =
+                            Texture::create_depth_texture(&state.device, &state.surface_config)
+                                .view;
+
+                        event_handler(AppEvent::Resize {
+                            width: size.width,
+                            height: size.height,
+                        });
+                    }
+                }
+
+                WindowEvent::KeyPressed { key_code } => {
+                    event_handler(AppEvent::KeyPressed { key_code })
+                }
+
+                WindowEvent::KeyUp { key_code } => event_handler(AppEvent::KeyUp { key_code }),
             }
-
-            WindowEvent::Close => event_handler(AppEvent::Finished),
-
-            WindowEvent::Resize { size } => event_handler(AppEvent::Resize {
-                width: size.width,
-                height: size.height,
-            }),
-
-            WindowEvent::KeyPressed { key_code } => {
-                event_handler(AppEvent::KeyPressed { key_code })
-            }
-
-            WindowEvent::KeyUp { key_code } => event_handler(AppEvent::KeyUp { key_code }),
         })
     }
 
@@ -99,44 +153,5 @@ impl App {
         F: 'static + FnMut(AppEvent),
     {
         pollster::block_on(self.run_async(event_handler));
-    }
-}
-
-impl App {
-    pub fn add_camera(
-        mut self,
-        unique_id: &'static str,
-        attributes: CameraInitialAttributes,
-    ) -> Self {
-        self.cameras.push(Camera::new(
-            unique_id,
-            attributes.position,
-            cgmath::Deg(attributes.v_rotation),
-            cgmath::Deg(attributes.h_rotation),
-        ));
-
-        self
-    }
-
-    pub fn initial_camera(mut self, unique_id: &'static str) -> Self {
-        if self.current_camera.is_some() {
-            panic!("Você já definiu a câmera inicial!");
-        }
-
-        let camera = *self
-            .cameras
-            .iter()
-            .find(|camera| camera.unique_id == unique_id)
-            .unwrap();
-
-        self.current_camera = Some(camera);
-
-        self
-    }
-
-    pub fn camera_projection(mut self, projection: Projection) -> Self {
-        self.camera_projection = Some(projection);
-
-        self
     }
 }
