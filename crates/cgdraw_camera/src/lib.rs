@@ -1,6 +1,5 @@
 use cgdraw_math::{matrix::Matrix4x4, num::BaseFloat, point::Point3, vector::Vec3};
 
-pub mod transformations;
 pub mod uniform;
 
 pub trait Camera<T: BaseFloat> {
