@@ -1,5 +1,6 @@
 struct Camera {
     view_proj: mat4x4<f32>,
+    // Será usado quando for implementado texturas e sistemas de iluminação
     view_position: vec4<f32>
 }
 
@@ -12,7 +13,7 @@ struct VertexInput {
 };
 
 struct VertexOutput {
-    @builtin(position) clip_position: vec4<f32>,
+    @builtin(position) clip_space: vec4<f32>,
     @location(0) color: vec3<f32>
 };
 
@@ -22,9 +23,10 @@ fn vs_main(
 ) -> VertexOutput {
     var out: VertexOutput;
     out.color = model.color;
-    let world_pos = vec4<f32>(model.position, 1.0);
-    out.clip_position = camera.view_proj * world_pos;
-    // out.clip_position =  world_pos;
+    let world_space = vec4<f32>(model.position, 1.0);
+
+    out.clip_space = camera.view_proj * world_space;
+
     return out;
 }
 
