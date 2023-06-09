@@ -2,6 +2,7 @@ use std::fmt;
 use std::mem;
 use std::ops::*;
 
+use num_traits::NumCast;
 use num_traits::{Float, Zero};
 
 use crate::angle::Rad;
@@ -114,6 +115,12 @@ impl<T: BaseNum> Vec4<T> {
     pub fn truncate(self) -> Vec3<T> {
         Vec3::new(self.x, self.y, self.z)
     }
+
+    /// Calcula o produto escalar entre dois vetores.
+    #[inline]
+    pub fn dot(self, other: Vec4<T>) -> T {
+        Vec4::mul(self, other).sum()
+    }
 }
 
 macro_rules! impl_vector {
@@ -144,6 +151,19 @@ macro_rules! impl_vector {
             #[inline]
             pub fn sum(self) -> T where T: Add<Output = T> {
                 fold_array!(add, { $(self.$field),+ })
+            }
+        }
+
+        impl<T: NumCast + Copy> $V<T> {
+            #[inline]
+            pub fn cast<S: NumCast>(&self) -> Option<$V<S>> {
+                $(
+                    let $field = match NumCast::from(self.$field) {
+                        Some(field) => field,
+                        None => return None
+                    };
+                )+
+                Some($V { $($field),+ })
             }
         }
 
@@ -235,6 +255,12 @@ macro_rules! impl_vector {
                 $V::new($(self.$field - rhs),+)
             }
         }
+
+        impl_index_operators!($V<T>, $n, T, usize);
+        impl_index_operators!($V<T>, $n, [T], Range<usize>);
+        impl_index_operators!($V<T>, $n, [T], RangeTo<usize>);
+        impl_index_operators!($V<T>, $n, [T], RangeFrom<usize>);
+        impl_index_operators!($V<T>, $n, [T], RangeFull);
     }
 }
 

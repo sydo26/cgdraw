@@ -48,6 +48,28 @@ macro_rules! impl_tuple_conversions {
     }
 }
 
+macro_rules! impl_index_operators {
+    ($VectorN:ident<$S:ident>, $n:expr, $Output:ty, $I:ty) => {
+        impl<$S> Index<$I> for $VectorN<$S> {
+            type Output = $Output;
+
+            #[inline]
+            fn index(&self, i: $I) -> &$Output {
+                let v: &[$S; $n] = self.as_ref();
+                &v[i]
+            }
+        }
+
+        impl<$S> IndexMut<$I> for $VectorN<$S> {
+            #[inline]
+            fn index_mut(&mut self, i: $I) -> &mut $Output {
+                let v: &mut [$S; $n] = self.as_mut();
+                &mut v[i]
+            }
+        }
+    };
+}
+
 macro_rules! impl_fixed_array_conversions {
     ($ArrayN:ident <$S:ident> { $($field:ident : $index:expr),+ }, $n:expr) => {
         #[allow(clippy::from_over_into)]
