@@ -71,6 +71,10 @@ impl Graphics<'_> {
 }
 
 impl Graphics<'_> {
+    pub fn load_identity(&mut self) {
+        self.transform_matrix = Matrix4x4::identity();
+    }
+
     pub fn scale_x(&mut self, scale: f32) {
         let scale_matrix = Matrix4x4::from_scale(Vec3::new(scale, 1.0, 1.0));
 
