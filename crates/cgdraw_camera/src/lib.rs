@@ -4,7 +4,7 @@ pub mod uniform;
 
 pub trait Camera<T: BaseFloat> {
     /// Calcula a matriz 4x4 de visualização da projeção da câmera no espaço global.
-    fn calc_view_proj(&mut self) -> Matrix4x4<T>;
+    fn calc_view_proj(&self) -> Matrix4x4<T>;
 }
 
 #[derive(Debug, Clone, Copy)]
