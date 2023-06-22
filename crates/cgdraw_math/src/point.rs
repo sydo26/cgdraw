@@ -2,6 +2,7 @@ use crate::num::BaseNum;
 use crate::vector::{Vec1, Vec2, Vec3, Vec4};
 use std::fmt;
 use std::mem;
+use std::ops::*;
 
 #[repr(C)]
 #[derive(PartialEq, Eq, Copy, Clone, Hash)]
@@ -65,6 +66,15 @@ macro_rules! impl_point {
             #[inline]
             pub fn dot(self, v: $VectorN<T>) -> T {
                 $VectorN::new($(self.$field * v.$field),+).sum()
+            }
+        }
+
+        impl<T: BaseNum> Sub<$P<T>> for $P<T> {
+            type Output = $VectorN<T>;
+
+            #[inline]
+            fn sub(self, rhs: $P<T>) -> $VectorN<T> {
+                $VectorN::new($(self.$field - rhs.$field),+)
             }
         }
     }
