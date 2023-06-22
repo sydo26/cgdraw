@@ -25,6 +25,7 @@ fn vs_main(
     out.color = model.color;
     let world_space = vec4<f32>(model.position, 1.0);
 
+    // Transforma o vértice para o espaço de tela
     out.clip_space = camera.view_proj * world_space;
 
     return out;
