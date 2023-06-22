@@ -10,6 +10,7 @@ use std::ops::*;
 use std::mem;
 
 /// Matriz 4x4, onde cada coluna é um vetor de 4 elementos.
+#[derive(Copy, Clone, PartialEq)]
 pub struct Matrix4x4<T> {
     pub c0: Vec4<T>,
     pub c1: Vec4<T>,
@@ -297,7 +298,6 @@ macro_rules! fixed_array_conversions {
         impl<$S: Copy> From<[[$S; $n]; $n]> for $MatrixN<$S> {
             #[inline]
             fn from(m: [[$S; $n]; $n]) -> $MatrixN<$S> {
-                // We need to use a copy here because we can't pattern match on arrays yet
                 $MatrixN { $($field: From::from(m[$index])),+ }
             }
         }
