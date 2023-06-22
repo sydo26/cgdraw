@@ -10,4 +10,6 @@ winit = "0.28.6"
 wgpu = { version = "0.16.0" }
 bytemuck = { version = "1.13.1", features = ["derive"] }
 palette = "0.7.0"
+num-traits = "0.2"
 cgmath = "0.18.0"
+cgdraw_math = { path = "../cgdraw_math", version = "0.1.0" }

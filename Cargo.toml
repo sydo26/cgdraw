@@ -20,6 +20,7 @@ cgdraw_core = { path = "crates/cgdraw_core", version = "0.1.0" }
 cgdraw_camera = { path = "crates/cgdraw_camera", version = "0.1.0" }
 cgdraw_math = { path = "crates/cgdraw_math", version = "0.1.0" }
 
+
 [workspace]
 members = [
     "crates/*",
