@@ -1,53 +1,84 @@
-use cgmath::Rad;
+use cgdraw_math::{angle::Rad, matrix::Matrix4x4, num::BaseFloat};
+use num_traits::cast;
 
-#[rustfmt::skip]
-pub const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(
-    1.0, 0.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 0.5, 0.0,
-    0.0, 0.0, 0.5, 1.0,
-);
-
-pub struct Projection {
+pub struct Projection<T> {
     /**
      * Aspecto que define a proporção
      * entre a largura e a altura da tela
      */
-    pub aspect: f32,
+    pub aspect: T,
 
     /**
      * Define o ângulo de visão da projeção
      */
-    pub fovy: Rad<f32>,
+    pub fovy: Rad<T>,
 
     /**
      * Define a distância do plano de visão
      * mais próximo da origem da projeção
      */
-    pub znear: f32,
+    pub znear: T,
 
     /**
      * Define a distância do plano de visão
      * mais distante da origem da projeção
      */
-    pub zfar: f32,
+    pub zfar: T,
 }
 
-impl Projection {
-    pub fn new(fovy: f32, znear: f32, zfar: f32) -> Self {
+impl<T: BaseFloat> Projection<T> {
+    pub fn new<F: Into<Rad<T>>>(fovy: F, znear: T, zfar: T) -> Self {
         Self {
-            aspect: 1.0,
-            fovy: cgmath::Deg(fovy).into(),
+            aspect: T::one(),
+            fovy: fovy.into(),
             znear,
             zfar,
         }
     }
 
     pub fn resize(&mut self, width: u32, height: u32) {
-        self.aspect = width as f32 / height as f32;
+        self.aspect = T::from(width).unwrap() / T::from(height).unwrap();
     }
 
-    pub fn to_wgpu_matrix(&self) -> cgmath::Matrix4<f32> {
-        OPENGL_TO_WGPU_MATRIX * cgmath::perspective(self.fovy, self.aspect, self.znear, self.zfar)
+    pub fn perspective(&self) -> Matrix4x4<T> {
+        let half: T = cast(0.5).unwrap();
+        #[rustfmt::skip]
+        let opengl_to_wgpu_matrix = Matrix4x4::new(
+            T::one(), T::zero(), T::zero(), T::zero(),
+            T::zero(), T::one(), T::zero(), T::zero(),
+            T::zero(), T::zero(), half, T::zero(),
+            T::zero(), T::zero(), half, T::one(),
+        );
+
+        let two: T = cast(2).unwrap();
+        let frad: Rad<T> = self.fovy / two;
+        let f = Rad::cot(frad);
+
+        let c0r0 = f / self.aspect;
+        let c0r1 = T::zero();
+        let c0r2 = T::zero();
+        let c0r3 = T::zero();
+
+        let c1r0 = T::zero();
+        let c1r1 = f;
+        let c1r2 = T::zero();
+        let c1r3 = T::zero();
+
+        let c2r0 = T::zero();
+        let c2r1 = T::zero();
+        let c2r2 = (self.zfar + self.znear) / (self.znear - self.zfar);
+        let c2r3 = -T::one();
+
+        let c3r0 = T::zero();
+        let c3r1 = T::zero();
+        let c3r2 = (two * self.zfar * self.znear) / (self.znear - self.zfar);
+        let c3r3 = T::zero();
+
+        let perspective_matrix = Matrix4x4::new(
+            c0r0, c0r1, c0r2, c0r3, c1r0, c1r1, c1r2, c1r3, c2r0, c2r1, c2r2, c2r3, c3r0, c3r1,
+            c3r2, c3r3,
+        );
+
+        opengl_to_wgpu_matrix * perspective_matrix
     }
 }
