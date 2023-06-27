@@ -1,7 +1,6 @@
 use std::time::Instant;
 
-use cgdraw_camera::uniform::CameraUniformFloat32;
-use cgdraw_core::graphic::Texture;
+use cgdraw_core::{graphic::Texture, uniforms::UniformsFloat32};
 use cgdraw_render::{Render, RenderState};
 use cgdraw_state::State;
 use cgdraw_ui::window::{Window, WindowEvent};
@@ -23,7 +22,7 @@ impl App {
     {
         let window = Window::default();
 
-        let mut state = State::new(&window.window, CameraUniformFloat32::default()).await;
+        let mut state = State::new(&window.window, UniformsFloat32::default()).await;
 
         let mut last_render_time = Instant::now();
 
@@ -84,7 +83,7 @@ impl App {
     }
 
     #[inline]
-    pub fn run<F>(mut self, event_handler: F) -> !
+    pub fn run<F>(self, event_handler: F) -> !
     where
         F: 'static + FnMut(AppEvent),
     {
