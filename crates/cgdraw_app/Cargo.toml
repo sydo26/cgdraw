@@ -14,5 +14,4 @@ cgdraw_camera = { path = "../cgdraw_camera", version = "0.1.0" }
 cgdraw_math = { path = "../cgdraw_math", version = "0.1.0" }
 pollster = "0.3.0"
 wgpu = "0.16.0"
-cgmath = "0.18.0"
 uuid = { version = "1.3.3", features = ["v4"] }

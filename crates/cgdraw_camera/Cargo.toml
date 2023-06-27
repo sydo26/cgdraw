@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 bytemuck = { version = "1.13.1", features = ["derive"] }
-cgmath = "0.18.0"
 wgpu = "0.16.0"
 cgdraw_core = { path = "../cgdraw_core", version = "0.1.0" }
 cgdraw_math = { path = "../cgdraw_math", version = "0.1.0" }

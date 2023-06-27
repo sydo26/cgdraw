@@ -79,15 +79,6 @@ dependencies = [
 
 [[package]]
 name = "approx"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f2a05fd1bd10b2527e20a2cd32d8873d115b8b39fe219ee25f42a8aca6ba278"
-dependencies = [
- "num-traits",
-]
-
-[[package]]
-name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cab112f0a86d568ea0e627cc1d6be74a1e9cd55214684db5561995f6dad897c6"
@@ -276,7 +267,6 @@ dependencies = [
  "cgdraw_render",
  "cgdraw_state",
  "cgdraw_ui",
- "cgmath",
  "pollster",
  "uuid",
  "wgpu",
@@ -289,7 +279,6 @@ dependencies = [
  "bytemuck",
  "cgdraw_core",
  "cgdraw_math",
- "cgmath",
  "wgpu",
 ]
 
@@ -299,7 +288,6 @@ version = "0.1.0"
 dependencies = [
  "bytemuck",
  "cgdraw_math",
- "cgmath",
  "num-traits",
  "palette",
  "wgpu",
@@ -310,7 +298,7 @@ dependencies = [
 name = "cgdraw_math"
 version = "0.1.0"
 dependencies = [
- "approx 0.5.1",
+ "approx",
  "num-traits",
 ]
 
@@ -331,7 +319,6 @@ version = "0.1.0"
 dependencies = [
  "cgdraw_camera",
  "cgdraw_core",
- "cgmath",
  "wgpu",
  "winit",
 ]
@@ -343,16 +330,6 @@ dependencies = [
  "cgdraw_core",
  "wgpu",
  "winit",
-]
-
-[[package]]
-name = "cgmath"
-version = "0.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a98d30140e3296250832bbaaff83b27dcd6fa3cc70fb6f1f3e5c9c0023b5317"
-dependencies = [
- "approx 0.4.0",
- "num-traits",
 ]
 
 [[package]]
@@ -1001,7 +978,7 @@ version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e1641aee47803391405d0a1250e837d2336fdddd18b27f3ddb8c1d80ce8d7f43"
 dependencies = [
- "approx 0.5.1",
+ "approx",
  "fast-srgb8",
  "palette_derive",
  "phf",
