@@ -26,12 +26,12 @@ impl<'a> Render<'a> {
 impl<'a> Render<'a> {
     fn render_pass(self) {
         if let Some(default_view) = self.default_view {
-            // CAMERA ===================
+            // UNIFORMS ===================
 
             self.state.queue.write_buffer(
-                &self.state.camera_buffer,
+                &self.state.uniforms_buffer,
                 0,
-                bytemuck::cast_slice(&[self.state.camera_uniform]),
+                bytemuck::cast_slice(&[self.state.uniforms]),
             );
 
             // ===========================
@@ -71,11 +71,9 @@ impl<'a> Render<'a> {
 
                 let mut pass = encoder.begin_render_pass(&desc);
 
-                // pass.set_stencil_reference(0);
-
                 for vb in self.render_state.buffers.vertices.iter() {
                     pass.set_pipeline(&self.state.main_pipeline.pipeline);
-                    pass.set_bind_group(0, &self.state.camera_bind_group, &[]);
+                    pass.set_bind_group(0, &self.state.uniforms_bind_group, &[]);
                     pass.draw_vertices(vb);
                 }
             }

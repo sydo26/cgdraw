@@ -13,6 +13,6 @@ impl<'a> AppHandler<'a> {
 // Camera Implementations
 impl<'a> AppHandler<'a> {
     pub fn camera_view_proj(&mut self, view_proj: [[f32; 4]; 4]) {
-        self.state.camera_uniform.view_proj = view_proj;
+        self.state.uniforms.camera.view_proj = view_proj;
     }
 }

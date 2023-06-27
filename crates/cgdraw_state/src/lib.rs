@@ -1,5 +1,4 @@
-use cgdraw_camera::uniform::CameraUniformFloat32;
-use cgdraw_core::graphic::Texture;
+use cgdraw_core::{graphic::Texture, uniforms::UniformsFloat32};
 use pipeline::MainPipeline;
 use winit::window::Window;
 
@@ -19,16 +18,16 @@ pub struct State {
     pub surface_config: wgpu::SurfaceConfiguration,
 
     /// O uniform da câmera que será usado para enviar os dados da câmera para o shader.
-    pub camera_uniform: CameraUniformFloat32,
+    pub uniforms: UniformsFloat32,
 
     /// O buffer da câmera que será usado para enviar os dados da câmera para o shader.
-    pub camera_buffer: wgpu::Buffer,
+    pub uniforms_buffer: wgpu::Buffer,
 
-    /// O layout do grupo de ligação da câmera que será usado para criar o grupo de ligação da câmera.
-    pub camera_bind_group_layout: wgpu::BindGroupLayout,
+    /// O layout do grupo de ligação do objeto uniforms que será usado para criar o grupo de ligação do objeto uniforms.
+    pub uniforms_bind_group_layout: wgpu::BindGroupLayout,
 
-    /// O grupo de ligação da câmera que será usado para enviar os dados da câmera para o shader.
-    pub camera_bind_group: wgpu::BindGroup,
+    /// O grupo de ligação do objeto uniforms que será usado para enviar os dados do uniforms para o shader.
+    pub uniforms_bind_group: wgpu::BindGroup,
 
     /// O pipeline principal que será usado para renderizar os gráficos.
     pub main_pipeline: MainPipeline,
@@ -38,7 +37,7 @@ pub struct State {
 }
 
 impl State {
-    pub async fn new(window: &Window, camera_uniform: CameraUniformFloat32) -> Self {
+    pub async fn new(window: &Window, uniforms: UniformsFloat32) -> Self {
         let size = window.inner_size();
 
         // Backends: Vulkan, Metal, DX12, DX11, Browser WebGPU e GL
@@ -98,16 +97,19 @@ impl State {
             view_formats: vec![],
         };
 
-        let camera_buffer = CameraUniformFloat32::create_buffer(&device, camera_uniform);
-        let camera_bind_group_layout = CameraUniformFloat32::create_bind_group_layout(&device);
-        let camera_bind_group = CameraUniformFloat32::create_bind_group(
+        let uniforms_buffer = UniformsFloat32::create_buffer(&device, uniforms);
+        let uniforms_bind_group_layout = UniformsFloat32::create_bind_group_layout(&device);
+        let uniforms_bind_group = UniformsFloat32::create_bind_group(
             &device,
-            &camera_bind_group_layout,
-            &camera_buffer,
+            &uniforms_bind_group_layout,
+            &uniforms_buffer,
         );
 
-        let main_pipeline =
-            MainPipeline::new(&device, surface_config.format, &[&camera_bind_group_layout]);
+        let main_pipeline = MainPipeline::new(
+            &device,
+            surface_config.format,
+            &[&uniforms_bind_group_layout],
+        );
 
         let depth_view = Texture::create_depth_texture(&device, &surface_config).view;
 
@@ -116,10 +118,10 @@ impl State {
             queue,
             surface,
             surface_config,
-            camera_uniform,
-            camera_buffer,
-            camera_bind_group_layout,
-            camera_bind_group,
+            uniforms,
+            uniforms_buffer,
+            uniforms_bind_group_layout,
+            uniforms_bind_group,
             main_pipeline,
             depth_view,
         }

@@ -1,7 +1,5 @@
 use cgdraw_math::{matrix::Matrix4x4, num::BaseFloat, point::Point3, vector::Vec3};
 
-pub mod uniform;
-
 pub trait Camera<T: BaseFloat> {
     /// Calcula a matriz 4x4 de visualização da projeção da câmera no espaço global.
     fn calc_view_proj(&self) -> Matrix4x4<T>;
