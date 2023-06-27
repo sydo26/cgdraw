@@ -6,11 +6,11 @@ pub use cgdraw_core::keyboard::keys::VirtualKeyCode;
 
 pub use cgdraw_camera::Camera;
 pub use cgdraw_camera::CameraAttributes;
-pub use cgdraw_core::projection::Projection;
 
 pub mod consts {}
 
 pub mod graphics {
+    pub use cgdraw_app::graphics::Graphics;
     pub use cgdraw_core::graphic::Vertex;
 }
 
@@ -19,6 +19,8 @@ pub mod event {
 }
 
 pub mod math {
+    pub use cgdraw_core::orthographic;
+    pub use cgdraw_core::perspective;
     pub use cgdraw_math::matrix::*;
     pub use cgdraw_math::point::*;
     pub use cgdraw_math::vector::*;
