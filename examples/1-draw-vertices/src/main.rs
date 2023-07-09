@@ -1,4 +1,4 @@
-use cgdraw::{event::AppEvent, AppBuilder, Color};
+use cgdraw::{event::AppEvent, graphics::Primitive, AppBuilder, Color};
 
 fn main() {
     let builder = AppBuilder::default();
@@ -13,22 +13,17 @@ fn main() {
         AppEvent::Update { .. } => {}
 
         AppEvent::Draw { graphics } => {
-            graphics.color(Color::RED);
-            graphics.save_vertice(-0.5, 0.5, 0.0);
-            graphics.color(Color::YELLOW);
-            graphics.save_vertice(0.5, 0.5, 0.0);
-            graphics.color(Color::BLUE);
-            graphics.save_vertice(0.5, -0.5, 0.0);
-            graphics.color(Color::SILVER);
-            graphics.save_vertice(-0.5, -0.5, 0.0);
+            graphics.color(Color::GOLD);
+            graphics.begin(Primitive::TriangleList);
+            {
+                graphics.v3d(-0.5, -0.5, 0.5);
+                graphics.v3d(0.5, -0.5, 0.5);
+                graphics.v3d(0.5, 0.5, 0.5);
+                graphics.v3d(-0.5, 0.5, 0.5);
 
-            graphics.draw(
-                [
-                    0, 1, 2, 2, 1, 0, // TRIANGULO 01
-                    0, 2, 3, 3, 2, 0, // TRIANGULO 02
-                ]
-                .to_vec(),
-            );
+                graphics.indices([0, 1, 2, 2, 3, 0].to_vec());
+            }
+            graphics.end();
         }
 
         AppEvent::KeyPressed { .. } => {
