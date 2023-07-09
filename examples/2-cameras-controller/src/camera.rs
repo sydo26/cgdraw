@@ -1,12 +1,21 @@
+use std::f32::consts::PI;
+
 use cgdraw::{
     angle::Deg,
-    math::{Matrix4x4, Point3, Vec3},
-    Camera, CameraAttributes, Projection,
+    math::{perspective, Matrix4x4, Point3, Vec3},
+    Camera, CameraAttributes,
 };
 
+#[derive(Clone, Copy, PartialEq)]
 pub struct ExampleCamera {
-    pub projection: Projection<f32>,
     attributes: CameraAttributes<f32>,
+    screen_width: u32,
+    screen_height: u32,
+
+    pub rotate_speed: f32,
+    pub move_speed: f32,
+
+    pub rotate: Vec3<f32>,
 }
 
 impl Default for ExampleCamera {
@@ -14,7 +23,7 @@ impl Default for ExampleCamera {
         let pos = Point3 {
             x: 0.0,
             y: 0.0,
-            z: 10.0,
+            z: 20.0,
         };
 
         let up = Vec3 {
@@ -26,13 +35,24 @@ impl Default for ExampleCamera {
         let target = Point3 {
             x: 0.0,
             y: 0.0,
-            z: -1.0,
+            z: 0.0,
         };
 
         Self {
             attributes: CameraAttributes::new(up, pos, target),
-            projection: Projection::new(Deg(90.0), 0.1, 100.0),
+            screen_width: 0,
+            screen_height: 0,
+            move_speed: (2.0 * PI) / 15.0,
+            rotate_speed: (2.0 * PI) / 15.0,
+            rotate: Vec3::new(0.0, 0.0, 0.0),
         }
+    }
+}
+
+impl ExampleCamera {
+    pub fn screen_resize(&mut self, width: u32, height: u32) {
+        self.screen_width = width;
+        self.screen_height = height;
     }
 }
 
@@ -44,6 +64,13 @@ impl Camera<f32> for ExampleCamera {
             self.attributes.up,
         );
 
-        self.projection.perspective() * look_at
+        let proj: Matrix4x4<f32> = perspective(
+            self.screen_width as f32 / self.screen_height as f32,
+            Deg(30.0).into(),
+            0.1,
+            100.0,
+        );
+
+        proj * look_at
     }
 }

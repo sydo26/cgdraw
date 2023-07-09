@@ -5,7 +5,7 @@ pub trait Camera<T: BaseFloat> {
     fn calc_view_proj(&self) -> Matrix4x4<T>;
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct CameraAttributes<T> {
     /// É o vetor que define a direção para cima da câmera.
     pub up: Vec3<T>,
