@@ -12,7 +12,7 @@ Aqui está uma lista de funcionalidades que podem não estar implementadas, mas 
 
 - [x] É possível desenhar triângulos na tela.
 - [x] É possível desenhar linhas na tela.
-- [ ] É possível controlar a matriz de projeção da câmera.
+- [x] É possível controlar a matriz de projeção da câmera.
 - [x] É possível implementar câmeras com diferentes tipos de projeção.
 - [ ] É possível implementar luz na cena.
 - [ ] É possível implementar sombras na cena.
@@ -20,6 +20,6 @@ Aqui está uma lista de funcionalidades que podem não estar implementadas, mas 
 - [x] É possível implementar animações na cena.
 - [x] É possível ler eventos do teclado.
 - [ ] É possível ler eventos do mouse.
-- [ ] É possível transformar objetos na cena.
+- [x] É possível transformar objetos na cena.
 - [ ] É possível importar modelos 3D.
-- [ ] É possível desenhar pontos na tela.
+- [x] É possível desenhar pontos na tela.
