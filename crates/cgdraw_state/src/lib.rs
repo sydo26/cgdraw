@@ -1,8 +1,10 @@
 use cgdraw_core::{graphic::Texture, uniforms::UniformsFloat32};
-use pipeline::MainPipeline;
+
+use pipelines::main::MainPipeline;
+use wgpu::RenderPipeline;
 use winit::window::Window;
 
-mod pipeline;
+mod pipelines;
 
 pub struct State {
     /// É o dispositivo que permite criar recursos como buffers e texturas.
@@ -29,8 +31,14 @@ pub struct State {
     /// O grupo de ligação do objeto uniforms que será usado para enviar os dados do uniforms para o shader.
     pub uniforms_bind_group: wgpu::BindGroup,
 
-    /// O pipeline principal que será usado para renderizar os gráficos.
-    pub main_pipeline: MainPipeline,
+    /// O pipeline que será usado para renderizar a primitiva de triângulo.
+    pub triangle_pipeline: RenderPipeline,
+
+    /// O pipeline que será usado para renderizar a primitiva de linha.
+    pub line_pipeline: RenderPipeline,
+
+    /// O pipeline que será usado para renderizar a primitiva de ponto.
+    pub point_pipeline: RenderPipeline,
 
     /// A textura de profundidade que será usada para renderizar os gráficos.
     pub depth_view: wgpu::TextureView,
@@ -105,11 +113,29 @@ impl State {
             &uniforms_buffer,
         );
 
-        let main_pipeline = MainPipeline::new(
+        let triangle_pipeline = MainPipeline::new(
             &device,
             surface_config.format,
+            wgpu::PrimitiveTopology::TriangleList,
             &[&uniforms_bind_group_layout],
-        );
+        )
+        .pipeline;
+
+        let line_pipeline = MainPipeline::new(
+            &device,
+            surface_config.format,
+            wgpu::PrimitiveTopology::LineList,
+            &[&uniforms_bind_group_layout],
+        )
+        .pipeline;
+
+        let point_pipeline = MainPipeline::new(
+            &device,
+            surface_config.format,
+            wgpu::PrimitiveTopology::PointList,
+            &[&uniforms_bind_group_layout],
+        )
+        .pipeline;
 
         let depth_view = Texture::create_depth_texture(&device, &surface_config).view;
 
@@ -122,7 +148,9 @@ impl State {
             uniforms_buffer,
             uniforms_bind_group_layout,
             uniforms_bind_group,
-            main_pipeline,
+            triangle_pipeline,
+            line_pipeline,
+            point_pipeline,
             depth_view,
         }
     }
