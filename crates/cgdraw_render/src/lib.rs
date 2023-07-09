@@ -6,15 +6,16 @@ mod state;
 use cgdraw_state::State;
 pub use graphic::*;
 pub use state::*;
+use wgpu::PrimitiveTopology;
 
 pub struct Render<'a> {
-    pub state: &'a State,
+    pub state: &'a mut State,
     pub render_state: RenderState,
     default_view: Option<wgpu::TextureView>,
 }
 
 impl<'a> Render<'a> {
-    pub fn new(state: &'a State, render_state: RenderState) -> Self {
+    pub fn new(state: &'a mut State, render_state: RenderState) -> Self {
         Self {
             state,
             render_state,
@@ -72,7 +73,19 @@ impl<'a> Render<'a> {
                 let mut pass = encoder.begin_render_pass(&desc);
 
                 for vb in self.render_state.buffers.vertices.iter() {
-                    pass.set_pipeline(&self.state.main_pipeline.pipeline);
+                    match vb.primitive_topology {
+                        PrimitiveTopology::TriangleList => {
+                            pass.set_pipeline(&self.state.triangle_pipeline);
+                        }
+                        PrimitiveTopology::LineList => {
+                            pass.set_pipeline(&self.state.line_pipeline);
+                        }
+                        PrimitiveTopology::PointList => {
+                            pass.set_pipeline(&self.state.point_pipeline);
+                        }
+                        _ => {}
+                    }
+
                     pass.set_bind_group(0, &self.state.uniforms_bind_group, &[]);
                     pass.draw_vertices(vb);
                 }

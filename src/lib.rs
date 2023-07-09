@@ -11,6 +11,7 @@ pub mod consts {}
 
 pub mod graphics {
     pub use cgdraw_app::graphics::Graphics;
+    pub use cgdraw_app::graphics::Primitive;
     pub use cgdraw_core::graphic::Vertex;
 }
 

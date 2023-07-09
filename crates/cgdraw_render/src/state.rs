@@ -2,6 +2,7 @@ pub struct VertexBufferState {
     pub vertex_buffer: wgpu::Buffer,
     pub index_buffer: wgpu::Buffer,
     pub num_elements: u32,
+    pub primitive_topology: wgpu::PrimitiveTopology,
 }
 
 pub struct BuffersState {
