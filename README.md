@@ -1,13 +1,25 @@
 # CG DRAW
 
-- [x] Configurar o repositório
-- [x] Permitir que ao usar o App, o usuário possa desenhar na tela
-- [x] Adicionar uma câmera inicial (Sem Ações)
-- [ ] Permitir ao usuário controlar várias câmeras, podendo alternar entre elas pelo código.
-- [ ] Adicionar funções de translação, rotação e escala para o `Graphics`.
-- [ ] Permitir ao usuário adicionar um modelo 3D importado.
-- [ ] Renderizar a luz.
-- [ ] Permitir ao usuário adicionar uma luz pelo `Graphics`.
-- [ ] Criar interface de objeto.
-- [ ] Adicionar objetos padrões a serem usados pelo usuário.
-- [ ] Permitir ao usuário desenhar linhas e pontos na tela com o `Graphics`.
+Esse projeto foi desenvolvido como projeto de conclusão da disciplina de `Computaçao Gráfica` e tem como objetivo criar uma biblioteca para desenhar objetos 3D em uma superfície 2D.
+
+## IMPORTANTE
+
+O intuito desta biblioteca é servir como ferramenta de aprendizado, não sendo recomendado para uso em produção.
+
+## Checklist
+
+Aqui está uma lista de funcionalidades que podem não estar implementadas, mas que são desejadas para o projeto.
+
+- [x] É possível desenhar triângulos na tela.
+- [x] É possível desenhar linhas na tela.
+- [ ] É possível controlar a matriz de projeção da câmera.
+- [x] É possível implementar câmeras com diferentes tipos de projeção.
+- [ ] É possível implementar luz na cena.
+- [ ] É possível implementar sombras na cena.
+- [ ] É possível implementar texturas na cena.
+- [x] É possível implementar animações na cena.
+- [x] É possível ler eventos do teclado.
+- [ ] É possível ler eventos do mouse.
+- [ ] É possível transformar objetos na cena.
+- [ ] É possível importar modelos 3D.
+- [ ] É possível desenhar pontos na tela.
