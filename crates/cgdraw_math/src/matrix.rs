@@ -185,6 +185,52 @@ impl<T: BaseFloat> Matrix4x4<T> {
         )
     }
 
+    /// Cria uma matriz 4x4 de rotação de um eixo arbitrário a partir de um ângulo em radianos
+    /// informado pelos eixos x,y e z.
+    /// ```rust
+    /// // Matriz Transposta
+    /// let c0r0 = cosz * cosy;
+    /// let c0r1 = cosy * sinz;
+    /// let c0r2 = siny;
+    ///
+    /// let c1r0 = -sinx * siny * cosz + cosx * sinz;
+    /// let c1r1 = -sinx * siny * sinz - cosx * cosz;
+    /// let c1r2 = sinx * cosy;
+    ///
+    /// let c2r0 = cosx * siny * cosz + sinx * sinz;
+    /// let c2r1 = cosx * siny * sinz - sinx * cosz;
+    /// let c2r2 = -cosx * cosy;
+    ///
+    /// [
+    ///     [c0r0, c0r1, c0r2, 0],
+    ///     [c1r0, c1r1, c1r2, 0],
+    ///     [c2r0, c2r1, c2r2, 0],
+    ///     [0,    0,    0,    1],
+    /// ]
+    /// ```
+    pub fn from_rotate(angle_x: Rad<T>, angle_y: Rad<T>, angle_z: Rad<T>) -> Matrix4x4<T> {
+        let (sin_x, cos_x) = angle_x.0.sin_cos();
+        let (sin_y, cos_y) = angle_y.0.sin_cos();
+        let (sin_z, cos_z) = angle_z.0.sin_cos();
+
+        Self::from_cols(
+            Vec4::new(cos_y * cos_z, cos_y * sin_z, sin_y, T::zero()),
+            Vec4::new(
+                -sin_x * sin_y * cos_z + cos_x + sin_z,
+                -sin_x * sin_y * sin_z - cos_x * cos_z,
+                sin_x * cos_y,
+                T::zero(),
+            ),
+            Vec4::new(
+                cos_x * sin_y * cos_z + sin_x * sin_z,
+                cos_x * sin_y * sin_z - sin_x * cos_z,
+                -cos_x * cos_y,
+                T::zero(),
+            ),
+            Vec4::new(T::zero(), T::zero(), T::zero(), T::one()),
+        )
+    }
+
     /// Cria uma matriz 4x4 de escala a partir de um vetor de 3 elementos (x, y, z).
     /// ```rust
     /// // Matriz Transposta
